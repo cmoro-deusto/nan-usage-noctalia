@@ -409,16 +409,44 @@ eq(progress.props.fill, "#e01b24", "a critical level draws in the alarm colour")
 reset()
 journal.state.data = published
 load("bar.luau")
-local barLabel
-walk(journal.tree, function(node)
-  if node.type == "label" and barLabel == nil then
-    barLabel = node
+-- The figure, the countdown and the model are three labels at two sizes, which is how
+-- the widget that sits beside this one on a real bar does it: the reading at full size
+-- carrying the colour, the context a couple of points smaller and muted.
+local function labelWith(text)
+  for _, node in ipairs(collect(journal.tree, "label")) do
+    if node.props.text == text then
+      return node
+    end
   end
-end)
-check(barLabel ~= nil and barLabel.props.fontSize == nil,
-  "the label sets no fontSize, so it inherits the bar's own font and sits like its neighbours")
-check(barLabel ~= nil and barLabel.props.baseline == nil,
-  "and no baseline either — the bar's default is what the other widgets use")
+  return nil
+end
+local figure = labelWith("80%")
+local countdown = labelWith("4d")
+local modelLabel = labelWith("ds4f")
+check(figure ~= nil and countdown ~= nil and modelLabel ~= nil,
+  "the bar paints the figure, the countdown and the model as separate labels")
+check(figure ~= nil and figure.props.fontSize == 11 and figure.props.fontWeight == "semibold",
+  "the figure reads at the bar's size, in semibold")
+check(countdown ~= nil and countdown.props.fontSize == 10, "the countdown is two points smaller")
+check(countdown ~= nil and countdown.props.color == "on_surface_variant", "and muted")
+check(modelLabel ~= nil and modelLabel.props.color == "on_surface_variant", "as is the model")
+check(countdown ~= nil and countdown.props.baseline == nil,
+  "with no baseline override: the row's own centring is what places it")
+
+-- The three toggles used to be the record's job, since the record composed one string.
+-- Now the widget composes them, so they are the widget's to honour.
+reset({ settings = { show_reset = false, show_model = false } })
+journal.state.data = published
+load("bar.luau")
+check(labelWith("80%") ~= nil, "the figure still shows with only it enabled")
+check(labelWith("4d") == nil, "the countdown is dropped when show_reset is off")
+check(labelWith("ds4f") == nil, "and the model when show_model is off")
+
+reset({ settings = { show_percentage = false } })
+journal.state.data = published
+load("bar.luau")
+check(labelWith("80%") == nil, "the figure is dropped when show_percentage is off")
+check(labelWith("4d") ~= nil, "and the countdown stays")
 
 reset()
 journal.state.data = published

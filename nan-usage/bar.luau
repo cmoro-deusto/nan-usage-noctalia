@@ -41,6 +41,18 @@ local function iconStyle()
   return noctalia.getConfig("icon_style") or "ghost"
 end
 
+local function showPercentage()
+  return noctalia.getConfig("show_percentage") ~= false
+end
+
+local function showReset()
+  return noctalia.getConfig("show_reset") ~= false
+end
+
+local function showModel()
+  return noctalia.getConfig("show_model") ~= false
+end
+
 -- The panel this plugin owns, addressed the way Noctalia names entries.
 local PANEL_ID = "cmoro-deusto/nan-usage:panel"
 
@@ -64,6 +76,19 @@ local GAUGE_HEIGHT = 5
 -- the bar stays quiet until there is something to say.
 local COLOR_WARN = "#ff7800"
 local COLOR_CRIT = "#e01b24"
+
+-- The muted ink for the countdown and the model, which are context rather than the
+-- reading itself.
+local MUTED = "on_surface_variant"
+
+-- Text sizes, matching the widgets this sits beside: the figure reads at the bar's
+-- size and carries the alarm colour, the countdown and the model are a point or two
+-- smaller and muted. In a row centred on the cross axis a smaller label sits a
+-- little above the centre of its taller neighbour, which is what makes the pair read
+-- as one figure rather than two.
+local SIZE_VALUE = 11
+local SIZE_CONTEXT = 10
+local SIZE_MODEL = 11
 
 -- How often the record is rebuilt from the data already held. Polling is the
 -- service's business; this only moves the countdowns on, so 15 s is plenty and
@@ -137,10 +162,50 @@ local function levelColor(level)
   return "on_surface"
 end
 
+-- The figure, its countdown and the model, as separate labels so each can carry its
+-- own size and ink. `panel` is the record's own panel block; when it is absent the
+-- widget is showing a dash and there is nothing to break up.
+local function textNodes(level, panel)
+  if panel == nil then
+    return ui.label({ text = "—", color = levelColor(level) })
+  end
+  local parts = {}
+  if showPercentage() then
+    parts[#parts + 1] = ui.label({
+      text = panel.percentText,
+      fontSize = SIZE_VALUE,
+      fontWeight = "semibold",
+      color = levelColor(level),
+      maxLines = 1,
+    })
+  end
+  if showReset() and panel.resetsIn ~= nil and panel.resetsIn ~= "" then
+    parts[#parts + 1] = ui.label({
+      text = panel.resetsIn,
+      fontSize = SIZE_CONTEXT,
+      color = MUTED,
+      maxLines = 1,
+    })
+  end
+  if showModel() and panel.short ~= nil and panel.short ~= "" then
+    parts[#parts + 1] = ui.label({
+      text = panel.short,
+      fontSize = SIZE_MODEL,
+      color = MUTED,
+      maxLines = 1,
+    })
+  end
+  if #parts == 0 then
+    -- Everything is off: the model is the only useful leftover.
+    return ui.label({ text = panel.short, fontSize = SIZE_MODEL, color = MUTED, maxLines = 1 })
+  end
+  return ui.row({ gap = 3, align = "center" }, parts)
+end
+
 -- The widget as a tree: the mark, the gauge, the text. One node set per paint, so
 -- nothing is left over from the render before it — the same reason the panel's
 -- cards set every prop.
-local function nodesFor(level, text, percent, gauge)
+local function nodesFor(level, panel, percent, gauge)
   local nodes = {}
   if showIcon() then
     table.insert(nodes, ui.image({ path = iconFile(), width = ICON_SIZE, height = ICON_SIZE }))
@@ -157,16 +222,12 @@ local function nodesFor(level, text, percent, gauge)
       radius = 3,
     }))
   end
-  -- No fontSize on purpose: an unset size inherits the bar's own font and scale, so
-  -- this text sits exactly where the other widgets' text sits. Setting one made it a
-  -- couple of points larger than its neighbours, whose cap-line therefore rode higher
-  -- in the bar.
-  table.insert(nodes, ui.label({ text = text, color = levelColor(level) }))
+  table.insert(nodes, textNodes(level, panel))
   return nodes
 end
 
-local function paint(level, text, percent, gauge, tooltip)
-  barWidget.render(ui.row({ gap = 6, align = "center" }, nodesFor(level, text, percent, gauge)))
+local function paint(level, panel, percent, gauge, tooltip)
+  barWidget.render(ui.row({ gap = 6, align = "center" }, nodesFor(level, panel, percent, gauge)))
   if not showTooltip() then
     return
   end
@@ -187,7 +248,7 @@ local function paintNothing(record)
   if record.stale == true then
     reason = reason .. " (showing the last data)"
   end
-  paint("ok", "—", 0, "none", reason)
+  paint("ok", nil, 0, "none", reason)
 end
 
 local function paintRecord(record)
@@ -196,11 +257,9 @@ local function paintRecord(record)
     paintNothing(record)
     return
   end
-  local text = panel.text
-  if text == nil or text == "" then
-    text = panel.percentText
-  end
-  paint(panel.level, text, panel.percent, record.gauge or "bar", rowsFor(record))
+  -- The parts are passed through rather than the record's composed one-liner: each
+  -- label needs its own size and ink, which a single string cannot carry.
+  paint(panel.level, panel, panel.percent, record.gauge or "bar", rowsFor(record))
 end
 
 local function repaint(data)
