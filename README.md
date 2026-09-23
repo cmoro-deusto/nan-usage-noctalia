@@ -82,7 +82,8 @@ With this repository's `nan-usage/` copied in as a top-level directory, that scr
 passes. What it and the review then expect:
 
 - `version` is semver and gets bumped on **every** change; `plugin_api` is the
-  oldest Noctalia API level the plugin needs (15 here, for `noctalia.openSettings`)
+  oldest Noctalia API level the plugin needs (22 here, so the three entries can
+  `require` the shared model; 15 of that is `noctalia.openSettings`)
   and only moves up when a newer capability is adopted.
 - `description` stays within 120 characters, and `tags` come from the allowed list
   (`bar`, `panel`, `ai`, `indicator` here).

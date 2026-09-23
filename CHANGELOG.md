@@ -22,9 +22,10 @@ First release.
   `gio` or `xdg-open`, and the plugin starts no process.
 - The logo as a themed ghost — white or black ink to match the shell's mode — or
   the coloured mark, from rasters generated out of one SVG.
-- **No dependencies.** The plugin owns the API key, polls `cloud-api.nan.builders`
-  itself and keeps the answers in memory; `dependencies` is empty, nothing is
-  spawned, and no file is written.
+- **No command line tool to install.** The plugin owns the API key, polls
+  `cloud-api.nan.builders` itself and keeps the answers in memory, and writes no
+  file. The only command it shells out to is the browser opener behind the panel's
+  link button, and only when that button is pressed.
 - Tests: the model under a fixed clock with no host at all, the three entries
   against stubs of the Noctalia API, and a static check of the manifest, the
   translations, the plugin id and every API member, `ui` prop and callback the
