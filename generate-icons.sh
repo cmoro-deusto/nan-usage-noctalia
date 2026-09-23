@@ -19,7 +19,9 @@
 # Needs rsvg-convert (librsvg). Run it again if nan.svg changes.
 set -euo pipefail
 
-HERE="$(cd "$(dirname "$0")" && pwd)"
+# The plugin directory is next to this script; it holds the SVG and receives the
+# rasters, since that is what the plugin ships.
+HERE="$(cd "$(dirname "$0")" && pwd)/nan-usage"
 SVG="$HERE/nan.svg"
 SIZE=96
 

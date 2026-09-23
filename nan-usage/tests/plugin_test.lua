@@ -145,6 +145,26 @@ local function reset(overrides)
       setUpdateInterval = function(ms) journal.updateInterval = ms end,
       isDarkMode = function() return world.darkMode ~= false end,
       commandExists = function(name) return (world.openers or {})[name] == true end,
+      expandPath = function(path) return (path:gsub("^~", os.getenv("HOME") or "~")) end,
+      -- Defined even though nothing should call them: a check that nothing is
+      -- spawned only means something if spawning would be recorded, and if the
+      -- entry under test never sees a nil function.
+      runAsync = function(command, callback)
+        table.insert(journal.commands, command)
+        if callback then
+          callback(world.commandResult or { exitCode = 0, stdout = "", stderr = "" })
+        end
+        return true
+      end,
+      runStream = function(command, onLine)
+        table.insert(journal.commands, command)
+        journal.stream = onLine
+        return true
+      end,
+      copyToClipboard = function(text)
+        journal.copied = text
+        return world.clipboardWorks ~= false
+      end,
       fileExists = function() return world.keyExists ~= false end,
       readFile = function()
         if world.keyReadable == false then
@@ -278,6 +298,17 @@ reset({ keyExists = false })
 check(load("service.luau"), "the poller loads without a key file")
 eq(#journal.requests, 0, "and asks the API nothing")
 eq(journal.state.data.error, "No API key at ~/.config/nan/api-key", "it says which file is missing")
+
+reset({ keyContents = "secret-key\n# a comment someone added\n" })
+load("service.luau")
+local firstLine = false
+for _, header in ipairs(journal.requests[1].headers) do
+  if header == "Authorization: Bearer secret-key" then
+    firstLine = true
+  end
+end
+check(firstLine, "only the first line of the key file is sent, so a stray comment cannot corrupt the header")
+eq(journal.state.data.error, "", "and a multi-line key file is not an error")
 
 reset({ keyReadable = false })
 load("service.luau")
@@ -460,6 +491,26 @@ journal.state.refresh = nil
 env.onRefresh()
 check(journal.state.refresh ~= nil, "the refresh button asks over the shared state channel")
 eq(#journal.commands, 0, "and not by running anything")
+
+-- Opening on a model, not on the overall entry: the header of a model's detail has
+-- to carry the tier pill too, and it used to reference an undefined global there.
+reset()
+journal.state.data = published
+journal.state.selected = "glm5.3-flash"
+load("panel.luau")
+env.onOpen({})
+local modelRender = journal.renders[#journal.renders]
+check(anyLabelMentions(modelRender, "glm5.3-flash"), "the panel opens on the selected model")
+check(anyLabelMentions(modelRender, "INFERENCE"), "and its header carries the tier pill, not a nil row")
+
+reset()
+journal.state.data = published
+load("panel.luau")
+env.onOpen({})
+journal.copied = nil
+env.onOpenSite()
+eq(journal.copied, "https://cloud.nan.builders", "the link button copies the dashboard address")
+eq(#journal.commands, 0, "and opens nothing, so the plugin needs no browser opener")
 
 reset()
 journal.state.data = published

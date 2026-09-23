@@ -12,13 +12,34 @@
 
 local shared = require("./shared.luau")
 
-local showIcon = noctalia.getConfig("show_icon") == true
-local showGlyph = noctalia.getConfig("show_glyph") == true
-local glyphName = noctalia.getConfig("glyph") or "chart-pie"
-local showTooltip = noctalia.getConfig("show_tooltip") ~= false
+-- Read per paint rather than once at load, so a change in the settings page lands
+-- without a reload. `~= false` for a setting whose manifest default is true, `== true`
+-- for one whose default is false: an unset value has to mean what the manifest says,
+-- and show_icon defaults to true.
+local function showIcon()
+  return noctalia.getConfig("show_icon") ~= false
+end
+
+local function showGlyph()
+  return noctalia.getConfig("show_glyph") == true
+end
+
+local function glyphName()
+  return noctalia.getConfig("glyph") or "chart-pie"
+end
+
+local function showTooltip()
+  return noctalia.getConfig("show_tooltip") ~= false
+end
+
 -- panel | nothing. The panel is Noctalia's own surface.
-local leftClick = noctalia.getConfig("left_click") or "panel"
-local iconStyle = noctalia.getConfig("icon_style") or "ghost"
+local function leftClick()
+  return noctalia.getConfig("left_click") or "panel"
+end
+
+local function iconStyle()
+  return noctalia.getConfig("icon_style") or "ghost"
+end
 
 -- The panel this plugin owns, addressed the way Noctalia names entries.
 local PANEL_ID = "cmoro-deusto/nan-usage:panel"
@@ -95,7 +116,7 @@ end
 -- Which raster to draw: the coloured mark, or the ghost in whichever ink the theme
 -- will read.
 local function iconFile()
-  if iconStyle == "color" then
+  if iconStyle() == "color" then
     return ICON_COLOR
   end
   if noctalia.isDarkMode() then
@@ -121,10 +142,10 @@ end
 -- cards set every prop.
 local function nodesFor(level, text, percent, gauge)
   local nodes = {}
-  if showIcon then
+  if showIcon() then
     table.insert(nodes, ui.image({ path = iconFile(), width = ICON_SIZE, height = ICON_SIZE }))
-  elseif showGlyph then
-    table.insert(nodes, ui.glyph({ name = glyphName, size = ICON_SIZE, color = levelColor(level) }))
+  elseif showGlyph() then
+    table.insert(nodes, ui.glyph({ name = glyphName(), size = ICON_SIZE, color = levelColor(level) }))
   end
   if gauge ~= "none" then
     table.insert(nodes, ui.progress({
@@ -142,7 +163,7 @@ end
 
 local function paint(level, text, percent, gauge, tooltip)
   barWidget.render(ui.row({ gap = 6, align = "center" }, nodesFor(level, text, percent, gauge)))
-  if not showTooltip then
+  if not showTooltip() then
     return
   end
   if tooltip == nil or (type(tooltip) == "table" and #tooltip == 0) then
@@ -198,7 +219,7 @@ function update()
 end
 
 function onClick()
-  if leftClick == "nothing" then
+  if leftClick() == "nothing" then
     return
   end
   noctalia.togglePanel(PANEL_ID)

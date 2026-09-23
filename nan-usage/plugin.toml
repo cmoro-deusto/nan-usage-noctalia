@@ -19,7 +19,9 @@ plugin_api = 22
 # stay put once someone has the widget on their bar.
 author = "cmoro-deusto"
 license = "MIT"
-# Nothing to declare: the plugin calls the NaN API itself and spawns no command.
+# Nothing to declare, and that is the truth rather than an omission: the plugin
+# calls the NaN API itself, spawns no process at all, and copies the dashboard
+# address to the clipboard instead of handing it to a browser opener.
 dependencies = []
 tags = ["bar", "panel", "ai", "indicator"]
 icon = "brain"

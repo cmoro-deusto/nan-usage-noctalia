@@ -44,6 +44,9 @@ reset. It is coloured by the burn rate rather than by the percentage alone:
   each model, then one line per consumption period.
 - **The gauge** beside the text is what `panel_gauge` says: `bar`, or `none` for text
   only. See Notes for why there is no ring.
+- **The link button** in the panel's header copies NaN's dashboard address
+  (`cloud.nan.builders`) to your clipboard. It does not open a browser: doing that
+  means spawning `gio` or `xdg-open`, and this plugin starts no process at all.
 
 The panel has two columns: the account and its models on the left, the selected
 one's detail on the right. `Overall` is the first entry and what the panel opens on;

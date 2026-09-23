@@ -18,6 +18,8 @@ First release.
   tokens used against the cap, the time to the reset and the reading of its burn
   rate. Noctalia places it, so it needs no compositor configuration.
 - **Values in the tooltip**, one line per model and per consumption period.
+- **The dashboard address is copied, not opened**: an opener would mean spawning
+  `gio` or `xdg-open`, and the plugin starts no process.
 - The logo as a themed ghost — white or black ink to match the shell's mode — or
   the coloured mark, from rasters generated out of one SVG.
 - **No dependencies.** The plugin owns the API key, polls `cloud-api.nan.builders`

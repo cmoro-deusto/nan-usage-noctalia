@@ -80,10 +80,8 @@
     "consumption": "Consumption",
     "tooltip_refresh": "Refresh now",
     "tooltip_settings": "Settings",
-    "tooltip_site": "Open the NaN panel (cloud.nan.builders)",
+    "tooltip_site": "Copy the NaN panel address (cloud.nan.builders)",
     "resets_in": "resets in {when}",
-    "open_failed": "Could not open the NaN panel",
-    "no_opener": "No program to open a link with: install xdg-utils (or gio from glib2)",
     "no_usage": "No usage in this period",
     "no_data": "No data yet",
     "waiting": "Waiting for the first poll…",
@@ -91,6 +89,8 @@
     "cached": "cached",
     "overall": "Overall",
     "recent": "{label}: {value}",
-    "contributions": "Where it went"
+    "contributions": "Where it went",
+    "copied": "The address is in your clipboard",
+    "copy_failed": "Could not copy the address"
   }
 }

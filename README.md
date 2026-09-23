@@ -62,7 +62,8 @@ render did not set it.
 
 `nan-usage/nan.svg` is the source of the three rasters the plugin draws — the coloured
 mark and a black-on-white/white-on-black ghost pair for the theme. Regenerate them
-with `nan-usage/generate-icons.sh` (needs `rsvg-convert`) after changing the SVG.
+with `./generate-icons.sh` at the repository root (needs `rsvg-convert`) after
+changing the SVG; it writes into `nan-usage/`, which is where the plugin ships them.
 
 They are rasters because whether a Qt build can render SVG depends on its image
 plugins being installed, and an icon that silently fails to appear is worse than a

@@ -14,7 +14,12 @@
 
 local shared = require("./shared.luau")
 
-local iconStyle = noctalia.getConfig("icon_style") or "ghost"
+-- Read per render rather than once, so a change in the settings page lands without
+-- a reload. `~= false` for a setting whose manifest default is true, `== true` for
+-- one whose default is false: an unset value must mean what the manifest says.
+local function iconStyle()
+  return noctalia.getConfig("icon_style") or "ghost"
+end
 
 -- Read per render rather than once, so a change in the settings page lands without
 -- a reload.
@@ -108,7 +113,7 @@ end
 -- Which raster to draw: the coloured mark, or the ghost in whichever ink the
 -- theme will read.
 local function iconFile()
-  if iconStyle == "color" then
+  if iconStyle() == "color" then
     return ICON_COLOR
   end
   if noctalia.isDarkMode() then
@@ -293,7 +298,7 @@ local function detailHeader(window)
   return ui.column({ gap = 4 }, {
     ui.row({ gap = 8, align = "center" }, {
       ui.label({ text = window.model, fontWeight = "bold", fontSize = 20, flexGrow = 1 }),
-      ui.row({ gap = 6, align = "center" }, right),
+      ui.row({ gap = 6, align = "center" }, accountPills()),
     }),
     ui.row({ gap = 6, align = "center" }, {
       ui.glyph({ name = "clock", size = 14, color = MUTED }),
@@ -506,31 +511,21 @@ end
 
 -- ------------------------------------------------------------------ actions
 
--- Noctalia has no API to open a URL, so this goes through the shell. `gio` ships
--- with glib2 and is on practically every system; `xdg-open` is the familiar one
--- but belongs to xdg-utils, which is often not installed. Whichever runs, a
--- failure is reported rather than swallowed.
-local function openURL(url)
-  for _, candidate in ipairs({ "gio open", "xdg-open" }) do
-    local program = string.match(candidate, "^%S+")
-    if noctalia.commandExists(program) then
-      noctalia.runAsync(candidate .. " " .. url, function(result)
-        if result.exitCode ~= 0 then
-          local reason = noctalia.string.trim(result.stderr or "")
-          if reason == "" then
-            reason = tr("panel.open_failed")
-          end
-          noctalia.notifyError(tr("panel.title"), reason)
-        end
-      end)
-      return
-    end
+-- Noctalia has no API to open a URL, and spawning `gio` or `xdg-open` would make a
+-- browser opener an external command that the plugin otherwise does not have at
+-- all. The address goes to the clipboard instead — the panel shows it as text too,
+-- and the tooltip says so — so nothing in this plugin starts a process. A copy that
+-- fails is reported rather than swallowed.
+local function copyURL(url)
+  if noctalia.copyToClipboard(url, "text/plain") then
+    noctalia.notify(tr("panel.title"), tr("panel.copied"))
+    return
   end
-  noctalia.notifyError(tr("panel.title"), tr("panel.no_opener"))
+  noctalia.notifyError(tr("panel.title"), tr("panel.copy_failed"))
 end
 
 function onOpenSite()
-  openURL(PANEL_URL)
+  copyURL(PANEL_URL)
 end
 
 function onOpenSettings()

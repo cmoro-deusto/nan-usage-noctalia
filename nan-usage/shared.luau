@@ -441,7 +441,10 @@ end
 
 -- The "handle · region" line under the title.
 function M.accountSummary(me)
-  local name = str(me and (me.handle ~= "" and me.handle or me.username))
+  local name = str(me and me.handle)
+  if name == "" then
+    name = str(me and me.username)
+  end
   local parts = {}
   if name ~= "" then
     parts[#parts + 1] = name

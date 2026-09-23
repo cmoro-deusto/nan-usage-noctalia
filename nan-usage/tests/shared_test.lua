@@ -206,6 +206,12 @@ eq(model.windows({
   models = { { model = "x", tokensUsed = 1, cap = 2, periodEnd = "junk" } },
 })[1].resetsAt, nil, "an unreadable timestamp is simply absent")
 
+-- The API may report a username and no handle; the fallback has to happen.
+eq(model.accountSummary({ username = "someone" }), "someone", "a username stands in for a missing handle")
+eq(model.accountSummary({ handle = "", username = "someone" }), "someone", "and for an empty one")
+eq(model.accountSummary({ handle = "carlos-3", username = "ignored" }), "carlos-3", "the handle wins when it is there")
+eq(model.accountSummary({}), "", "an account with nothing in it is empty")
+
 -- ── aggregates ──────────────────────────────────────────────────────────────
 
 local metrics = { last24h = { totalTokens = 5e6 }, monthToDate = { totalTokens = 4e7 }, last30d = 4.4e7 }

@@ -4,8 +4,9 @@
 -- It holds the API key, fetches the three responses the model reads, and publishes
 -- what came back on the plugin's shared state under "data". The bar widget and the
 -- panel are subscribers: each builds the record from that data with its own clock,
--- so the countdowns keep moving between polls, and neither of them spawns a process
--- or touches the network.
+-- so the bar's countdowns move between polls — the panel rebuilds on each poll and
+-- on opening, since it is usually open for a moment — and neither of them spawns a
+-- process or touches the network.
 --
 -- Nothing here judges anything. Levels, projections and text live in shared.luau,
 -- which the surfaces run too; this file only says what came back and what did not.
@@ -43,7 +44,16 @@ local pending = 0
 local lastPoll = 0
 
 local function publish()
-  noctalia.state.set(DATA_KEY, data)
+  -- A copy, not the same table every time: a host that compares by identity would
+  -- otherwise see no change and never notify the surfaces.
+  local snapshot = {
+    quota = data.quota,
+    me = data.me,
+    metrics = data.metrics,
+    fetchedAt = data.fetchedAt,
+    error = data.error,
+  }
+  noctalia.state.set(DATA_KEY, snapshot)
 end
 
 local function keyPath()
@@ -56,17 +66,24 @@ end
 
 -- The key, or a sentence saying which of the ways it can be missing happened.
 local function readKey()
-  local path = keyPath()
+  -- The configured path is what the messages name, since that is what the setting
+  -- shows and what someone would go and look at; the expanded one is only for the
+  -- file calls.
+  local configured = keyPath()
+  local path = noctalia.expandPath(configured)
   if not noctalia.fileExists(path) then
-    return nil, "No API key at " .. path
+    return nil, "No API key at " .. configured
   end
   local contents, err = noctalia.readFile(path)
   if contents == nil then
-    return nil, "Could not read " .. path .. " (" .. tostring(err) .. ")"
+    return nil, "Could not read " .. configured .. " (" .. tostring(err) .. ")"
   end
-  local key = tostring(contents):match("^%s*(.-)%s*$")
+  -- Only the first line: a key is one token, and a stray second line (a comment
+  -- someone added) would otherwise end up inside the Authorization header.
+  local key = tostring(contents):match("^[^\r\n]*") or ""
+  key = key:match("^%s*(.-)%s*$") or ""
   if key == "" then
-    return nil, "The key file at " .. path .. " is empty"
+    return nil, "The key file at " .. configured .. " is empty"
   end
   return key
 end
@@ -130,7 +147,7 @@ local function get(endpoint, key)
     end
     settle(endpoint.slot, value, reason)
   end)
-  if started ~= true then
+  if started == false then
     settle(endpoint.slot, nil, "Could not start a request to " .. API)
   end
 end
@@ -141,11 +158,14 @@ local function poll(force)
     return
   end
   if not force and lastPoll > 0 and os.time() - lastPoll < intervalMs() / 2000 then
-    -- The first tick after load can arrive almost immediately; do not fetch twice.
+    -- The first tick after load can arrive almost immediately, and the host calls
+    -- update() again on a settings change. Half an interval is the floor between
+    -- two polls; a surface's refresh bypasses it.
     return
   end
   local key, reason = readKey()
   if key == nil then
+    reason = reason or ("Could not read a key from " .. keyPath())
     data.error = reason
     publish()
     noctalia.log("NaN Usage: " .. reason)
