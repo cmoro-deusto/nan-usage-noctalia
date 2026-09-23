@@ -19,10 +19,13 @@ plugin_api = 22
 # stay put once someone has the widget on their bar.
 author = "cmoro-deusto"
 license = "MIT"
-# Nothing to declare, and that is the truth rather than an omission: the plugin
-# calls the NaN API itself, spawns no process at all, and copies the dashboard
-# address to the clipboard instead of handing it to a browser opener.
-dependencies = []
+# The API key is read by this plugin itself, so there is no CLI to depend on. The
+# one thing that leaves the process is the panel's link button: Noctalia has no API
+# to open a URL, so NaN's dashboard goes to whichever browser opener exists —
+# `gio` (glib2) or `xdg-open` (xdg-utils) — and with neither installed the address
+# is copied to the clipboard instead. Declared rather than left implicit, since the
+# submission template asks for every command a plugin shells out to.
+dependencies = ["gio", "xdg-open"]
 tags = ["bar", "panel", "ai", "indicator"]
 icon = "brain"
 description = "Your NaN (nan.builders) quota in the bar: usage per model, time to the reset, and a warning if the burn rate is risky."
@@ -149,6 +152,17 @@ type = "bool"
 label_key = "settings.show_tooltip.label"
 description_key = "settings.show_tooltip.description"
 default = true
+
+[[setting]]
+key = "site_action"
+type = "select"
+label_key = "settings.site_action.label"
+description_key = "settings.site_action.description"
+default = "open"
+options = [
+  { value = "open", label_key = "settings.site_action.open" },
+  { value = "copy", label_key = "settings.site_action.copy" },
+]
 
 [[setting]]
 key = "left_click"

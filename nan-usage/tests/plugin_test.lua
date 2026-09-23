@@ -503,14 +503,40 @@ local modelRender = journal.renders[#journal.renders]
 check(anyLabelMentions(modelRender, "glm5.3-flash"), "the panel opens on the selected model")
 check(anyLabelMentions(modelRender, "INFERENCE"), "and its header carries the tier pill, not a nil row")
 
+reset({ openers = { ["xdg-open"] = true } })
+journal.state.data = published
+load("panel.luau")
+env.onOpen({})
+journal.copied = nil
+env.onOpenSite()
+check(journal.commands[1] ~= nil and journal.commands[1]:find("xdg-open", 1, true) ~= nil,
+  "the link button opens NaN's dashboard through the opener that exists")
+eq(journal.copied, nil, "and does not bother copying")
+
+reset({ openers = { ["gio"] = true } })
+journal.state.data = published
+load("panel.luau")
+env.onOpen({})
+env.onOpenSite()
+check(journal.commands[1]:find("^gio open", 1) ~= nil, "preferring gio when both are there")
+
+reset({ settings = { site_action = "copy" } })
+journal.state.data = published
+load("panel.luau")
+env.onOpen({})
+journal.copied = nil
+env.onOpenSite()
+eq(journal.copied, "https://cloud.nan.builders", "and it can copy the address instead, when asked to")
+eq(#journal.commands, 0, "without starting anything")
+
 reset()
 journal.state.data = published
 load("panel.luau")
 env.onOpen({})
 journal.copied = nil
 env.onOpenSite()
-eq(journal.copied, "https://cloud.nan.builders", "the link button copies the dashboard address")
-eq(#journal.commands, 0, "and opens nothing, so the plugin needs no browser opener")
+eq(journal.copied, "https://cloud.nan.builders", "with no opener installed the address is copied")
+eq(#journal.commands, 0, "so the button is never dead")
 
 reset()
 journal.state.data = published

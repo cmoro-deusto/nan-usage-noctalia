@@ -2,30 +2,27 @@
 
 Your [NaN](https://nan.builders) subscription quota in the Noctalia bar: how much
 of each model's allowance is gone, how long until it resets, and whether the burn
-rate is heading for a lockout — with a panel of per-model detail behind it.
-
-The plugin talks to the NaN cloud API itself. It needs no command installed, spawns
-no process and writes no file.
+rate is heading for a lockout — with a panel of per-model detail behind it. The
+plugin talks to NaN's API itself, so there is no command line tool to install.
 
 ## Plugin
 
-| | |
+| Field | Value |
 | --- | --- |
 | ID | `cmoro-deusto/nan-usage` |
-| Bar widget | `bar` |
-| Panel | `panel` |
-| Service | `poller` |
-| License | MIT |
-| Plugin API | 22 (`require`) |
+| Entries | Bar widget: `bar`; panel: `panel`; service: `poller` |
 
 ## Requirements
 
-**A NaN API key**, at `~/.config/nan/api-key` by default — the same file the `nan`
-command line tool reads, so if you already use that, there is nothing to do. A
-different path can be set under Settings.
+**A NaN API key**, at `~/.config/nan/api-key` by default. That is the file the `nan`
+command line tool reads, so if you already use that, there is nothing to do; another
+path can be set under Settings. Without a key the widget shows a dash and the
+tooltip says which file is missing.
 
-Nothing else. There is no command to install and nothing to keep on `PATH`: the
-plugin asks `cloud-api.nan.builders` directly, with that key.
+For the panel's link button, either `gio` (glib2) or `xdg-open` (xdg-utils) opens
+NaN's dashboard in your browser. Neither is required: with neither installed the
+button copies the address to your clipboard instead, and that behaviour can also be
+chosen outright under Settings.
 
 ## Usage
 
@@ -44,9 +41,6 @@ reset. It is coloured by the burn rate rather than by the percentage alone:
   each model, then one line per consumption period.
 - **The gauge** beside the text is what `panel_gauge` says: `bar`, or `none` for text
   only. See Notes for why there is no ring.
-- **The link button** in the panel's header copies NaN's dashboard address
-  (`cloud.nan.builders`) to your clipboard. It does not open a browser: doing that
-  means spawning `gio` or `xdg-open`, and this plugin starts no process at all.
 
 The panel has two columns: the account and its models on the left, the selected
 one's detail on the right. `Overall` is the first entry and what the panel opens on;
@@ -77,6 +71,7 @@ own cog.
 | `show_model` | `bool` | `true` | Which model the figure belongs to, abbreviated (`ds4f`). |
 | `hide_unused` | `bool` | `false` | Drop models with no usage from the panel's list. |
 | `show_metrics` | `bool` | `true` | The account-wide 24 h / month / 30 d totals, in the panel and the tooltip. Turning it off also saves the request. |
+| `site_action` | `select` | `open` | What the link button does: open NaN's dashboard, or copy its address. |
 | `show_icon` | `bool` | `true` | Draw the NaN mark in the bar. |
 | `icon_style` | `select` | `ghost` | `ghost` draws the mark in the theme's own ink (white on a dark theme, black on a light one); `color` draws it as NaN does. |
 | `show_glyph` | `bool` | `false` | Draw a glyph instead of the mark, when `show_icon` is off. |
@@ -84,29 +79,24 @@ own cog.
 | `show_tooltip` | `bool` | `true` | Show the details on hover. |
 | `left_click` | `select` | `panel` | What a left click does: open the panel, or nothing. |
 
-## Where the data comes from
-
-Three requests, once per `interval`, all of them `GET`s to
-`https://cloud-api.nan.builders` with your key as a bearer token:
-
-| Endpoint | What it carries |
-| --- | --- |
-| `/api/usage/quota` | Every model's allowance for the period, what is used, when it resets. |
-| `/api/auth/me` | The account handle, region and tier. |
-| `/api/metrics/usage` | Aggregate consumption over 24 h, the month and 30 d. Skipped when `show_metrics` is off. |
-
-That is the whole of the plugin's traffic. Nothing else is contacted, no file is
-read but the key, and no file is written — the key and the responses are held in
-memory only, so a reload starts from nothing and shows a dash until the first
-request lands.
-
-The NaN API has no published contract; the shapes it returns were read from the
-NaN panel itself. Answers are parsed leniently — numbers may arrive as strings,
-timestamps as epoch seconds or ISO dates — and anything unreadable is reported in
-the tooltip rather than swallowed.
-
 ## Notes
 
+- **Network.** Three requests, once per `interval`, all of them `GET`s to
+  `https://cloud-api.nan.builders` with your key as a bearer token:
+  `/api/usage/quota` (every model's allowance, what is used, when it resets),
+  `/api/auth/me` (the account handle, region and tier) and `/api/metrics/usage`
+  (aggregate consumption over 24 h, the month and 30 d — skipped when `show_metrics`
+  is off). Nothing else is contacted.
+- **Sensitive data.** Your API key is read from the file above, sent to that host as
+  a bearer token over TLS, and held in memory. It is never logged, never shown in
+  the tooltip or the panel, and never written anywhere. The responses are held in
+  memory only, so a reload starts from nothing and shows a dash until the first
+  request lands.
+- **Files written.** None.
+- **Processes spawned.** One, and only when you press the link button: `gio open` or
+  `xdg-open`, whichever exists, to hand NaN's dashboard to your browser. With
+  neither installed the address is copied instead. Nothing else in the plugin starts
+  a process, and no command has to be on `PATH` for the widget or the panel to work.
 - **Levels come from the rate, not the percentage.** 80 % of a month on the third
   day is a warning, and so is a projection that lands past 75 %; running out is
   critical only when it would leave you without quota for a tenth of the period or
@@ -119,6 +109,9 @@ the tooltip rather than swallowed.
   The captions are in the panel, which has the room.
 - **One poller serves every monitor.** The widget can be on several bars; the service
   is one entry per plugin, so the API traffic does not multiply.
+- **Compositors.** Nothing here is compositor-specific: the plugin uses the bar,
+  panel and service APIs and no IPC to any window manager, so it behaves the same
+  under any compositor Noctalia supports.
 - **When something is wrong** the last good numbers stay on the bar and the tooltip
   says so, together with the reason: a missing key, a rejected key, an unreachable
   API, or an answer that could not be read.
@@ -146,13 +139,14 @@ argument instead of reading a clock.
 
 The second drives the real `service.luau`, `bar.luau` and `panel.luau`: that the
 poller reads the key, asks the endpoints, publishes what came back and keeps the
-last good numbers when one fails; that the widget and the panel paint that data
-without spawning anything; and that a refresh is asked for over the shared state
-channel rather than by running a program.
+last good numbers when one fails; that the widget and the panel paint that data; that
+the only thing ever spawned is the browser opener, and only when the link button is
+pressed; and that a refresh is asked for over the shared state channel rather than by
+running a program.
 
 The third is static, and needs Python 3.11 or newer for its TOML reader: the
-manifest against its own translation keys, the plugin directory against its id,
-and every API member, `ui` control, `ui` prop, callback and translation key the
-scripts use against Noctalia's own definitions, which it downloads — the check is
-skipped without network. It also refuses a `local` function called above its own
-definition, which is a nil global at runtime.
+manifest against its own translation keys, the plugin directory against its id, and
+every API member, `ui` control, `ui` prop, callback and translation key the scripts
+use against Noctalia's own definitions, which it downloads — the check is skipped
+without network. It also refuses a `local` function called above its own definition,
+which is a nil global at runtime.

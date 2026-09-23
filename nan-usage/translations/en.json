@@ -72,6 +72,12 @@
       "description": "Open Noctalia's own panel for this plugin (no compositor configuration needed), or do nothing. A right click opens these settings.",
       "panel": "Open the panel",
       "nothing": "Nothing"
+    },
+    "site_action": {
+      "label": "What the link button does",
+      "description": "Open NaN's dashboard in your browser, through gio or xdg-open, or copy the address instead. With neither opener installed the address is copied either way.",
+      "open": "Open in the browser",
+      "copy": "Copy the address"
     }
   },
   "panel": {
@@ -91,6 +97,8 @@
     "recent": "{label}: {value}",
     "contributions": "Where it went",
     "copied": "The address is in your clipboard",
-    "copy_failed": "Could not copy the address"
+    "copy_failed": "Could not copy the address",
+    "no_opener_copied": "No browser opener installed, so the address is in your clipboard",
+    "open_failed": "Could not open the NaN panel"
   }
 }

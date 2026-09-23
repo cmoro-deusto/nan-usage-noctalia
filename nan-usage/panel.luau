@@ -21,6 +21,10 @@ local function iconStyle()
   return noctalia.getConfig("icon_style") or "ghost"
 end
 
+local function siteAction()
+  return noctalia.getConfig("site_action") or "open"
+end
+
 -- Read per render rather than once, so a change in the settings page lands without
 -- a reload.
 local function config()
@@ -511,21 +515,50 @@ end
 
 -- ------------------------------------------------------------------ actions
 
--- Noctalia has no API to open a URL, and spawning `gio` or `xdg-open` would make a
--- browser opener an external command that the plugin otherwise does not have at
--- all. The address goes to the clipboard instead — the panel shows it as text too,
--- and the tooltip says so — so nothing in this plugin starts a process. A copy that
--- fails is reported rather than swallowed.
+-- The address to the clipboard. Nothing installed is needed for this, so it is also
+-- what the link button falls back on when no browser opener exists.
 local function copyURL(url)
   if noctalia.copyToClipboard(url, "text/plain") then
     noctalia.notify(tr("panel.title"), tr("panel.copied"))
-    return
+    return true
   end
   noctalia.notifyError(tr("panel.title"), tr("panel.copy_failed"))
+  return false
 end
 
+-- Noctalia has no API to open a URL, so it goes through the shell. `gio` ships with
+-- glib2 and is on practically every system; `xdg-open` is the familiar one but
+-- belongs to xdg-utils, which is often not installed. Whichever runs, a failure is
+-- reported rather than swallowed; when neither exists, the address is copied
+-- instead, so the button does something useful rather than nothing.
+local function openURL(url)
+  for _, candidate in ipairs({ "gio open", "xdg-open" }) do
+    local program = candidate:match("^%S+")
+    if noctalia.commandExists(program) then
+      noctalia.runAsync(candidate .. " " .. url, function(result)
+        if result.exitCode ~= 0 then
+          local reason = noctalia.string.trim(result.stderr or "")
+          if reason == "" then
+            reason = tr("panel.open_failed")
+          end
+          noctalia.notifyError(tr("panel.title"), reason)
+        end
+      end)
+      return
+    end
+  end
+  copyURL(url)
+  noctalia.notify(tr("panel.title"), tr("panel.no_opener_copied"))
+end
+
+-- open | copy. Opening is the default because it is what a link button is for; the
+-- setting is there for anyone who would rather not have a process started at all.
 function onOpenSite()
-  copyURL(PANEL_URL)
+  if siteAction() == "copy" then
+    copyURL(PANEL_URL)
+    return
+  end
+  openURL(PANEL_URL)
 end
 
 function onOpenSettings()
