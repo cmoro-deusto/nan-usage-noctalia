@@ -40,7 +40,7 @@ reset. It is coloured by the burn rate rather than by the percentage alone:
 - **Hover** lists the values: tokens used against the cap and the time to reset for
   each model, then one line per consumption period.
 - **The gauge** beside the text is what `panel_gauge` says: `bar`, or `none` for text
-  only. See Notes for why there is no ring.
+  only.
 
 The panel has two columns: the account and its models on the left, the selected
 one's detail on the right. `Overall` is the first entry and what the panel opens on;
@@ -101,12 +101,6 @@ own cog.
   day is a warning, and so is a projection that lands past 75 %; running out is
   critical only when it would leave you without quota for a tenth of the period or
   more, because running out just before the reset is merely a bad day.
-- **A bar widget cannot draw a ring.** Noctalia has no arc primitive inside a bar,
-  and `ui.progress` is the only gauge it renders there, so the only gauge settings
-  are a bar and none. The panel draws its own bars, which have the room.
-- **The tooltip carries values, not sentences**, on purpose: the captions are long
-  enough that a tooltip cuts their tail, and a cut-off number is worse than none.
-  The captions are in the panel, which has the room.
 - **One poller serves every monitor.** The widget can be on several bars; the service
   is one entry per plugin, so the API traffic does not multiply.
 - **Compositors.** Nothing here is compositor-specific: the plugin uses the bar,
