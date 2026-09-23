@@ -124,9 +124,11 @@ invisible to reading: a first line Luau rejects while `luac` accepts it, a `loca
 function called above its own definition, and a prop the host keeps because the next
 render did not set it.
 
-Two things are easy to get wrong when editing it. Bump `version` in `plugin.toml` on
-every change. Write `translations/en.json` as nested objects, because a dotted key would
-be rewritten on the next i18n sync, so `a.b` as a key silently churns.
+Two things are easy to get wrong when editing the plugin. Bump `version` in
+`plugin.toml` when the plugin changes, with the changelog entry in the same commit.
+Cleaning up a file in this repository, this README included, needs neither. Write
+`translations/en.json` as nested objects, because a dotted key would be rewritten on the
+next i18n sync, so `a.b` as a key silently churns.
 
 ## The icons
 
