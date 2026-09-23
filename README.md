@@ -1,9 +1,9 @@
 # NaN Usage, a Noctalia plugin
 
 Your NaN (nan.builders) subscription quota in the Noctalia bar. The widget shows the
-model that is worst off: its usage percentage, the time to the reset, and a colour that
-follows the burn rate instead of the percentage alone. Clicking it opens a panel with
-the detail for every model. The plugin talks to NaN's cloud API itself, so there is
+model that is most at risk of running out: its usage percentage, the time to the reset,
+and a colour that follows the burn rate instead of the percentage alone. Clicking it
+opens a panel with the detail for every model. The plugin talks to NaN's cloud API itself, so there is
 nothing to install alongside it and no command has to be on `PATH`.
 
 `nan-usage/` is the plugin, and its id is `cmoro-deusto/nan-usage`. The directory name
