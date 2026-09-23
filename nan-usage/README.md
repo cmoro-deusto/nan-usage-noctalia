@@ -3,7 +3,7 @@
 Your [NaN](https://nan.builders) subscription quota in the Noctalia bar: how much
 of each model's allowance is gone, how long until it resets, and whether the burn
 rate is heading for a lockout — with a panel of per-model detail behind it. The
-plugin talks to NaN's API itself, so there is no command line tool to install.
+plugin talks to NaN's API itself.
 
 ## Plugin
 
@@ -14,9 +14,9 @@ plugin talks to NaN's API itself, so there is no command line tool to install.
 
 ## Requirements
 
-**A NaN API key**, at `~/.config/nan/api-key` by default. That is the file the `nan`
-command line tool reads, so if you already use that, there is nothing to do; another
-path can be set under Settings. Without a key the widget shows a dash and the
+**A NaN API key**, at `~/.config/nan/api-key` by default. That is the file NaN's own
+`nan` command line tool reads, so if you already use that, there is nothing to do;
+another path can be set under Settings. Without a key the widget shows a dash and the
 tooltip says which file is missing.
 
 For the panel's link button, either `gio` (glib2) or `xdg-open` (xdg-utils) opens
