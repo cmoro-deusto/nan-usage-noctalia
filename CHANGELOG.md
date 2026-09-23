@@ -3,7 +3,7 @@
 The format loosely follows [Keep a Changelog](https://keepachangelog.com/), and
 the project uses [semantic versioning](https://semver.org/).
 
-## [1.0.0] — unreleased
+## [1.0.0]
 
 First release.
 
