@@ -516,7 +516,11 @@ function M.barText(panel, cfg)
     -- Everything is off: the model is the only useful leftover.
     return panel.short
   end
-  return table.concat(parts, " · ")
+  -- No spaces around the separator: in a bar, a full space either side of a middot
+  -- reads as three separate things rather than one figure. (A thin space would be
+  -- the typographic answer, but the theme's bar font may not have U+2009, and a
+  -- missing glyph is worse than a tight separator.)
+  return table.concat(parts, "·")
 end
 
 local function toWindow(w, now)

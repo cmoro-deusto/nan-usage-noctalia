@@ -442,7 +442,7 @@ local tooltipRows = journal.tooltip
 check(type(tooltipRows) == "table" and #tooltipRows >= 3, "the tooltip lists the models")
 local hasValues = false
 for _, row in ipairs(tooltipRows or {}) do
-  if row.value == "2.4B / 3B · 4d" then
+  if row.value == "2.4B / 3B·4d" then
     hasValues = true
   end
 end

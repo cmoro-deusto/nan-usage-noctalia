@@ -89,8 +89,8 @@ end
 -- The tooltip is the per-model detail, which is what the bar has no room for.
 local function rowsFor(record)
   local rows = {}
-  -- Values only. The caption says the same thing in a sentence ("… · resets in
-  -- 7d 8h · at this rate …"), and its tail is what gets cut off first.
+  -- Values only, and tight: the caption says the same thing in a sentence ("… ·
+  -- resets in 7d 8h · at this rate …"), whose tail is what a tooltip cuts off first.
   if record.error ~= nil and record.error ~= "" then
     local text = record.error
     if record.stale == true then
@@ -101,7 +101,7 @@ local function rowsFor(record)
   for _, window in ipairs(record.windows or {}) do
     local value = (window.usedText or "") .. " / " .. (window.capText or "")
     if window.resetsIn ~= nil and window.resetsIn ~= "" then
-      value = value .. " · " .. window.resetsIn
+      value = value .. "·" .. window.resetsIn
     end
     table.insert(rows, { key = window.model, value = value })
   end
