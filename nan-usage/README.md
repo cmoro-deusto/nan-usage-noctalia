@@ -1,52 +1,55 @@
 # NaN Usage
 
-Your [NaN](https://nan.builders) subscription quota in the Noctalia bar: how
-loaded the worst model is, the time until its reset, and a colour when the burn
-rate is heading for trouble. The panel behind the widget shows one bar per model,
-where the period's tokens went, and the account's aggregate consumption.
+Your [NaN](https://nan.builders) subscription quota in the Noctalia bar: how much
+of each model's allowance is gone, how long until it resets, and whether the burn
+rate is heading for a lockout — with a panel of per-model detail behind it.
 
-It is a front end to the `nan-usage` command line tool: the plugin runs it, paints
-what it prints, and decides nothing itself.
+The plugin talks to the NaN cloud API itself. It needs no command installed, spawns
+no process and writes no file.
 
 ## Plugin
 
-| Field | Value |
+| | |
 | --- | --- |
 | ID | `cmoro-deusto/nan-usage` |
-| Entries | Bar widget: `bar`; panel: `panel` |
+| Bar widget | `bar` |
+| Panel | `panel` |
+| Service | `poller` |
+| License | MIT |
+| Plugin API | 22 (`require`) |
 
 ## Requirements
 
-Install **`nan-usage`** and put it on `PATH` — the bar widget runs it, and nothing
-works without it. The tool needs a NaN API key in `~/.config/nan/api-key`, the
-same file the `nan` CLI uses; `nan-usage doctor` reports on the key, the API, the
-cache and the widget setup in one go.
+**A NaN API key**, at `~/.config/nan/api-key` by default — the same file the `nan`
+command line tool reads, so if you already use that, there is nothing to do. A
+different path can be set under Settings.
 
-GTK4 is **optional**: it is only used by `nan-usage popup` and `nan-usage prefs`,
-the separate windows described under Notes. The widget and the panel are Noctalia
-surfaces and need nothing beyond the shell itself.
+Nothing else. There is no command to install and nothing to keep on `PATH`: the
+plugin asks `cloud-api.nan.builders` directly, with that key.
 
 ## Usage
 
-The bar widget shows the percentage of the model that is worst off and its time
-to reset, coloured by the tool's verdict: your theme's own colour while the burn
-rate is fine, amber if the average rate projects past 75 % by the reset, red if
-that rate would exhaust the quota and leave you locked out for a tenth of the
-period or more.
+The bar widget shows the percentage of the model that is worst off and its time to
+reset. It is coloured by the burn rate rather than by the percentage alone:
+
+- your theme's own colour while the rate is fine,
+- amber once the average rate projects past 75 % by the reset, or once the quota
+  would run out,
+- red once usage passes 90 %, or once that run-out would leave the account without
+  quota for a tenth of the period or more.
 
 - **Left click** opens the panel. Pressing again closes it.
-- **Right click** opens the tool's GTK settings window, if GTK4 is installed.
-- **Hover** lists the values: tokens used against the cap and the time to reset
-  for each model, then one line per consumption period.
-- **The gauge** beside the text is what `panel_gauge` says: `bar` or `ring` (both
-  draw the bar — see Notes) or `none` for text only.
+- **Right click** opens these settings.
+- **Hover** lists the values: tokens used against the cap and the time to reset for
+  each model, then one line per consumption period.
+- **The gauge** beside the text is what `panel_gauge` says: `bar`, or `none` for text
+  only. See Notes for why there is no ring.
 
 The panel has two columns: the account and its models on the left, the selected
-one's detail on the right. `Overall` is the first entry and what the panel opens
-on; it shows the aggregate consumption, one bar per period, and each model's
-share of the period's tokens. Pick a model to see its percentage, a thicker bar,
-the time to its reset, tokens used against the cap, and the tool's reading of its
-burn rate.
+one's detail on the right. `Overall` is the first entry and what the panel opens on;
+it shows the aggregate consumption, one bar per period, and each model's share of
+the period's tokens. Pick a model to see its percentage, a thicker bar, the time to
+its reset, tokens used against the cap, and the reading of its burn rate.
 
 Open the panel from anywhere, including a compositor key binding:
 
@@ -61,51 +64,67 @@ own cog.
 
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
-| `command` | `string` | `nan-usage` | The executable to run. Give it an absolute path if the shell Noctalia spawns cannot reach your `PATH`. |
-| `left_click` | `select` | `panel` | What a left click does: open the panel, open the GTK popup window instead, or nothing. |
-| `interval` | `int` | `60` | Seconds between records. This is *not* the poll interval: the tool asks the NaN API on its own schedule (`poll_seconds` in its own configuration) and recomputes the reset countdowns in between. |
+| `api_key` | `file` | `~/.config/nan/api-key` | The file holding your NaN API key. |
+| `interval` | `int` | `300` | Seconds between requests to the NaN API. |
+| `panel_model` | `select` | `worst` | Which model the bar reflects: the most alarming, the fullest, or a pinned one. |
+| `panel_model_id` | `string` | `deepseek-v4-flash` | The model to pin, when `panel_model` is `fixed`. |
+| `panel_gauge` | `select` | `bar` | The indicator beside the text: `bar` or `none`. |
+| `show_percentage` | `bool` | `true` | The usage figure in the bar. |
+| `show_reset` | `bool` | `true` | The countdown to the reset, in the bar. |
+| `show_model` | `bool` | `true` | Which model the figure belongs to, abbreviated (`ds4f`). |
+| `hide_unused` | `bool` | `false` | Drop models with no usage from the panel's list. |
+| `show_metrics` | `bool` | `true` | The account-wide 24 h / month / 30 d totals, in the panel and the tooltip. Turning it off also saves the request. |
 | `show_icon` | `bool` | `true` | Draw the NaN mark in the bar. |
 | `icon_style` | `select` | `ghost` | `ghost` draws the mark in the theme's own ink (white on a dark theme, black on a light one); `color` draws it as NaN does. |
 | `show_glyph` | `bool` | `false` | Draw a glyph instead of the mark, when `show_icon` is off. |
 | `glyph` | `glyph` | `chart-pie` | Which glyph, when `show_glyph` is on. |
 | `show_tooltip` | `bool` | `true` | Show the details on hover. |
+| `left_click` | `select` | `panel` | What a left click does: open the panel, or nothing. |
 
-The gauge follows the **tool's** own setting rather than a second copy here:
+## Where the data comes from
 
-```sh
-nan-usage config set panel_gauge bar     # ring, bar or none
-```
+Three requests, once per `interval`, all of them `GET`s to
+`https://cloud-api.nan.builders` with your key as a bearer token:
+
+| Endpoint | What it carries |
+| --- | --- |
+| `/api/usage/quota` | Every model's allowance for the period, what is used, when it resets. |
+| `/api/auth/me` | The account handle, region and tier. |
+| `/api/metrics/usage` | Aggregate consumption over 24 h, the month and 30 d. Skipped when `show_metrics` is off. |
+
+That is the whole of the plugin's traffic. Nothing else is contacted, no file is
+read but the key, and no file is written — the key and the responses are held in
+memory only, so a reload starts from nothing and shows a dash until the first
+request lands.
+
+The NaN API has no published contract; the shapes it returns were read from the
+NaN panel itself. Answers are parsed leniently — numbers may arrive as strings,
+timestamps as epoch seconds or ISO dates — and anything unreadable is reported in
+the tooltip rather than swallowed.
 
 ## Notes
 
-- **Commands it runs.** The widget keeps one `nan-usage watch --json` process
-  alive (the tool is what talks to NaN, with your key in `~/.config/nan/api-key`
-  and its cache in `$XDG_CACHE_HOME/nan-usage/`). The panel's refresh button runs
-  `nan-usage json --force`, right click runs `nan-usage prefs`, and the link button
-  opens NaN's dashboard, `cloud.nan.builders`, in your browser — through `gio
-  open`, falling back to `xdg-open`, reporting the failure when neither exists. The
-  plugin itself makes no network request and writes no file.
-- **A bar widget cannot draw a ring.** Noctalia has no arc primitive inside the
-  bar, so `ring` comes out as the bar; only the separate GTK popup draws a real
-  ring. The setting is honoured, its shape is not.
-- **The tooltip carries values, not sentences**, on purpose: the tool's captions
-  are long enough that a tooltip cuts their tail, and a cut-off number is worse
-  than none. The captions are in the panel, which has the room.
-- **Multi-monitor.** Each bar gets its own widget instance and therefore its own
-  `watch` process. They share one cache and the tool's poll floor, so this does not
-  multiply the API traffic.
-- **The GTK windows are optional** and separate: `nan-usage popup` (a per-model
-  popup with the burn-rate projection, floated under the bar by a compositor rule)
-  and `nan-usage prefs` (the tool's own settings). Neither is needed for the widget
-  or the panel.
-- **Debugging.** The panel logs one line when it loads; Noctalia logs every prop or
-  control it skips. If the bar is empty or the panel blank:
-  `grep -i 'NaN Usage' ~/.cache/noctalia/noctalia.log`, then `nan-usage doctor`.
-- **The plugin is optional to the tool.** Nothing here changes what the command
-  line tool, its popup or its settings window do; they work with Noctalia absent.
+- **Levels come from the rate, not the percentage.** 80 % of a month on the third
+  day is a warning, and so is a projection that lands past 75 %; running out is
+  critical only when it would leave you without quota for a tenth of the period or
+  more, because running out just before the reset is merely a bad day.
+- **A bar widget cannot draw a ring.** Noctalia has no arc primitive inside a bar,
+  and `ui.progress` is the only gauge it renders there, so the only gauge settings
+  are a bar and none. The panel draws its own bars, which have the room.
+- **The tooltip carries values, not sentences**, on purpose: the captions are long
+  enough that a tooltip cuts their tail, and a cut-off number is worse than none.
+  The captions are in the panel, which has the room.
+- **One poller serves every monitor.** The widget can be on several bars; the service
+  is one entry per plugin, so the API traffic does not multiply.
+- **When something is wrong** the last good numbers stay on the bar and the tooltip
+  says so, together with the reason: a missing key, a rejected key, an unreachable
+  API, or an answer that could not be read.
+- **Debugging.** Noctalia logs every prop or control it skips; add the plugin's own
+  lines with `grep -i 'NaN Usage' ~/.cache/noctalia/noctalia.log`. If the bar shows
+  a dash, the tooltip names the reason.
 - **Community project, not official**: not affiliated with or endorsed by
-  nan.builders. "NaN" and its logo belong to their owners, and the logo shipped
-  here — the SVG the rasters are drawn from — derives from their public favicon.
+  nan.builders. "NaN" and its logo belong to their owners, and the logo shipped here
+  — the SVG the rasters are drawn from — derives from their public favicon.
   MIT-licensed.
 
 ## Tests
@@ -113,20 +132,24 @@ nan-usage config set panel_gauge bar     # ring, bar or none
 Run from this directory:
 
 ```sh
-lua tests/plugin_test.lua          # executes both scripts against stubs of the API
+lua tests/shared_test.lua          # the model, under a fixed clock, with no host
+lua tests/plugin_test.lua          # the three entries against stubs of the API
 python3 tests/plugin_check.py      # reads the manifest, the translations and the scripts
 ```
 
-The first drives the real `bar.luau` and `panel.luau` through a record, a failed
-record and an unreadable one; it clicks a model and checks that the highlight moved
-with it, opens the overall entry, refreshes with a working and a failing command,
-and checks the gauge, the tooltip and the icon against the settings. Several bugs
-in this plugin could only ever show up at runtime, so the tests run the scripts
-rather than reading them.
+The first is the model on its own: levels, projections and every text, asserted
+exactly — which is only possible because the model takes the current time as an
+argument instead of reading a clock.
 
-The second is static, and needs Python 3.11 or newer for its TOML reader: the
-manifest against its own translation keys, the plugin directory against its id, and
-every API member, `ui` control, `ui` prop, callback and translation key the scripts
-use against Noctalia's own definitions, which it downloads — the check is skipped
-without network. It also refuses a `local` function called above its own
+The second drives the real `service.luau`, `bar.luau` and `panel.luau`: that the
+poller reads the key, asks the endpoints, publishes what came back and keeps the
+last good numbers when one fails; that the widget and the panel paint that data
+without spawning anything; and that a refresh is asked for over the shared state
+channel rather than by running a program.
+
+The third is static, and needs Python 3.11 or newer for its TOML reader: the
+manifest against its own translation keys, the plugin directory against its id,
+and every API member, `ui` control, `ui` prop, callback and translation key the
+scripts use against Noctalia's own definitions, which it downloads — the check is
+skipped without network. It also refuses a `local` function called above its own
 definition, which is a nil global at runtime.

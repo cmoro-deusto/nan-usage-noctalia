@@ -1,8 +1,8 @@
 # NaN Usage — Noctalia v5+ plugin: a bar widget and the panel behind it.
 #
-# Optional adapter: the tool itself knows nothing about Noctalia. This plugin
-# only runs `nan-usage watch --json` and paints fields of what comes back, so the
-# project works exactly the same with it installed or not.
+# Self-contained: this plugin calls the NaN cloud API itself, so it needs nothing
+# installed beyond Noctalia. `service.luau` is the only part that touches the
+# network, `shared.luau` holds the model, and the two surfaces paint what it says.
 #
 # The repository root is a plugin *source*: this directory is named after the part
 # of the id that follows the slash, which is the layout a source has to have. That
@@ -12,48 +12,102 @@
 id = "cmoro-deusto/nan-usage"
 name = "NaN Usage"
 version = "1.0.0"
-# 15 is what noctalia.openSettings() needs, for the cog in the panel's header.
-plugin_api = 15
+# 22 is what require() needs for shared.luau, the model the three entries share;
+# 15 of it is noctalia.openSettings(), behind the cog and the right-click.
+plugin_api = 22
 # The first half of every entry id ("cmoro-deusto/nan-usage:bar"), so it has to
 # stay put once someone has the widget on their bar.
 author = "cmoro-deusto"
 license = "MIT"
-dependencies = ["nan-usage"]
+# Nothing to declare: the plugin calls the NaN API itself and spawns no command.
+dependencies = []
 tags = ["bar", "panel", "ai", "indicator"]
 icon = "brain"
 description = "Your NaN (nan.builders) quota in the bar: usage per model, time to the reset, and a warning if the burn rate is risky."
 
 # Settings are plugin-level, which is what puts them behind the cog: the panel's
-# header opens this page, and the bar widget reads the same values through
-# noctalia.getConfig().
+# header opens this page, and both surfaces read the same values.
 
 [[setting]]
-key = "command"
-type = "string"
-label_key = "settings.command.label"
-description_key = "settings.command.description"
-default = "nan-usage"
-
-[[setting]]
-key = "left_click"
-type = "select"
-label_key = "settings.left_click.label"
-description_key = "settings.left_click.description"
-default = "panel"
-options = [
-  { value = "panel", label_key = "settings.left_click.panel" },
-  { value = "popup", label_key = "settings.left_click.popup" },
-  { value = "nothing", label_key = "settings.left_click.nothing" },
-]
+key = "api_key"
+type = "file"
+label_key = "settings.api_key.label"
+description_key = "settings.api_key.description"
+default = "~/.config/nan/api-key"
 
 [[setting]]
 key = "interval"
 type = "int"
 label_key = "settings.interval.label"
 description_key = "settings.interval.description"
-default = 60
+default = 300
 min = 15
 max = 1800
+
+[[setting]]
+key = "panel_model"
+type = "select"
+label_key = "settings.panel_model.label"
+description_key = "settings.panel_model.description"
+default = "worst"
+options = [
+  { value = "worst", label_key = "settings.panel_model.worst" },
+  { value = "max", label_key = "settings.panel_model.max" },
+  { value = "fixed", label_key = "settings.panel_model.fixed" },
+]
+
+[[setting]]
+key = "panel_model_id"
+type = "string"
+label_key = "settings.panel_model_id.label"
+description_key = "settings.panel_model_id.description"
+default = "deepseek-v4-flash"
+
+[[setting]]
+key = "panel_gauge"
+type = "select"
+label_key = "settings.panel_gauge.label"
+description_key = "settings.panel_gauge.description"
+default = "bar"
+options = [
+  { value = "bar", label_key = "settings.panel_gauge.bar" },
+  { value = "none", label_key = "settings.panel_gauge.none" },
+]
+
+[[setting]]
+key = "show_percentage"
+type = "bool"
+label_key = "settings.show_percentage.label"
+description_key = "settings.show_percentage.description"
+default = true
+
+[[setting]]
+key = "show_reset"
+type = "bool"
+label_key = "settings.show_reset.label"
+description_key = "settings.show_reset.description"
+default = true
+
+[[setting]]
+key = "show_model"
+type = "bool"
+label_key = "settings.show_model.label"
+description_key = "settings.show_model.description"
+default = true
+
+[[setting]]
+key = "hide_unused"
+type = "bool"
+label_key = "settings.hide_unused.label"
+description_key = "settings.hide_unused.description"
+default = false
+
+[[setting]]
+key = "show_metrics"
+type = "bool"
+label_key = "settings.show_metrics.label"
+description_key = "settings.show_metrics.description"
+default = true
 
 [[setting]]
 key = "show_icon"
@@ -93,6 +147,23 @@ type = "bool"
 label_key = "settings.show_tooltip.label"
 description_key = "settings.show_tooltip.description"
 default = true
+
+[[setting]]
+key = "left_click"
+type = "select"
+label_key = "settings.left_click.label"
+description_key = "settings.left_click.description"
+default = "panel"
+options = [
+  { value = "panel", label_key = "settings.left_click.panel" },
+  { value = "nothing", label_key = "settings.left_click.nothing" },
+]
+
+# The poller. It owns the API key and the three requests; the widget and the panel
+# are subscribers of what it publishes.
+[[service]]
+id = "poller"
+entry = "service.luau"
 
 [[widget]]
 id = "bar"

@@ -1,7 +1,8 @@
 # Noctalia plugin: NaN Usage
 
-The Noctalia plugin for the `nan-usage` command line tool: a bar widget showing
-your NaN subscription quota, and a panel with the per-model detail behind it.
+A self-contained Noctalia plugin: a bar widget showing your NaN subscription
+quota, and a panel with the per-model detail behind it. It calls the NaN cloud API
+itself, so nothing has to be installed and no command has to be on `PATH`.
 
 `nan-usage/` is the plugin: its id is `cmoro-deusto/nan-usage`, and the directory
 is named after the part after the slash, which is the layout a Noctalia plugin
@@ -35,13 +36,17 @@ next configuration reload, which toggling the plugin forces.
 make test
 ```
 
-which is the two checks in `nan-usage/tests/`:
+which is the three checks in `nan-usage/tests/`:
 
-- `plugin_test.lua` executes `bar.luau` and `panel.luau` against stubs of the
-  Noctalia API and drives them — a record, a failed record, an unreadable one, a
-  click on a model, a click on the overall entry, a working refresh and a failing
-  one — and checks the gauge, the tooltip, the icons and the selection against the
-  settings. Plain Lua 5.4, no dependencies, under a second.
+- `shared_test.lua` is the model on its own — levels, projections and every text,
+  exactly, under a fixed clock — with no host and no stubs at all, because the model
+  takes the current time as an argument instead of reading a clock.
+- `plugin_test.lua` drives the real `service.luau`, `bar.luau` and `panel.luau`
+  against stubs of the Noctalia API and asserts what matters: that the poller reads
+  the key, asks its endpoints with it and publishes what came back; that a failed
+  poll keeps the last good numbers and says why; that the surfaces paint that data
+  without spawning anything; and that a refresh is asked for over the shared state
+  channel. Plain Lua 5.4, no dependencies, under a second.
 - `plugin_check.py` reads rather than runs: the manifest against its translation
   keys, the plugin directory against its id, and every API member, `ui` control,
   `ui` prop, callback and translation key against Noctalia's own type definitions,

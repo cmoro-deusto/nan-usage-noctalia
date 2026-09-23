@@ -1,16 +1,59 @@
 {
   "settings": {
-    "command": {
-      "label": "Command",
-      "description": "The nan-usage executable. Give it an absolute path if the shell Noctalia spawns cannot reach it."
+    "api_key": {
+      "label": "API key file",
+      "description": "The file holding your NaN API key, the same one the nan command line tool reads. It is sent to cloud-api.nan.builders and nowhere else."
     },
     "interval": {
-      "label": "Redraw interval (seconds)",
-      "description": "How often the tool prints a record. It polls the NaN API on its own schedule (poll_seconds in its own configuration); this only decides how often the countdown is redrawn."
+      "label": "Poll interval (seconds)",
+      "description": "How often the NaN API is asked. The quota moves slowly, so five minutes is plenty; the countdowns move between polls on their own."
+    },
+    "panel_model": {
+      "label": "Which model the bar shows",
+      "description": "The bar has room for one model. Worst ranks by how alarming the burn rate is, then by usage; Fullest goes by usage alone; Fixed pins one model id.",
+      "worst": "The most alarming",
+      "max": "The fullest",
+      "fixed": "A pinned model"
+    },
+    "panel_model_id": {
+      "label": "Pinned model",
+      "description": "The model id the bar shows when Which model the bar shows is a pinned model, exactly as the API spells it (deepseek-v4-flash)."
+    },
+    "panel_gauge": {
+      "label": "Gauge",
+      "description": "Noctalia draws no arc in a bar, so a ring is not offered — the bar is the only gauge it renders there. The panel draws its own.",
+      "bar": "A bar",
+      "none": "No gauge, text only"
+    },
+    "show_percentage": {
+      "label": "Show the percentage",
+      "description": "The usage figure in the bar, as a whole number. Below 10% it keeps one decimal in the panel's captions."
+    },
+    "show_reset": {
+      "label": "Show the countdown",
+      "description": "How long until the quota resets, next to the percentage."
+    },
+    "show_model": {
+      "label": "Show the model",
+      "description": "Which model the percentage belongs to, abbreviated (ds4f for deepseek-v4-flash)."
+    },
+    "hide_unused": {
+      "label": "Hide unused models",
+      "description": "Drop models with no usage from the panel's list. A pinned model stays, so it can still be inspected."
+    },
+    "show_metrics": {
+      "label": "Show consumption totals",
+      "description": "Add the account-wide 24 h, month and 30 d totals to the panel and the tooltip. It costs one more request per poll."
     },
     "show_icon": {
       "label": "Show the NaN logo",
       "description": "Draw the NaN logo before the text. It replaces the glyph; if it does not appear, this Qt build has no SVG image support, so use the glyph instead."
+    },
+    "icon_style": {
+      "label": "Logo style",
+      "description": "Ghost draws the mark in the theme's own ink, which sits in a row of glyphs; Color draws it as NaN does.",
+      "ghost": "Ghost (themed)",
+      "color": "Colour"
     },
     "show_glyph": {
       "label": "Show a glyph",
@@ -22,20 +65,13 @@
     },
     "show_tooltip": {
       "label": "Details in the tooltip",
-      "description": "Show a line per model, with tokens used against the cap and the projection, when you hover the widget."
+      "description": "Show a line per model, with tokens used against the cap and the countdown, when you hover the widget."
     },
     "left_click": {
       "label": "What a left click does",
-      "description": "Open Noctalia's own panel for this plugin (no compositor configuration needed), open the GTK popup window instead, or do nothing.",
+      "description": "Open Noctalia's own panel for this plugin (no compositor configuration needed), or do nothing. A right click opens these settings.",
       "panel": "Open the panel",
-      "popup": "Open the GTK popup",
       "nothing": "Nothing"
-    },
-    "icon_style": {
-      "label": "Logo style",
-      "description": "Ghost draws the mark in the theme's own ink, which sits in a row of glyphs; Color draws it as NaN does.",
-      "ghost": "Ghost (themed)",
-      "color": "Colour"
     }
   },
   "panel": {
@@ -50,8 +86,8 @@
     "no_opener": "No program to open a link with: install xdg-utils (or gio from glib2)",
     "no_usage": "No usage in this period",
     "no_data": "No data yet",
-    "waiting": "Waiting for {command}…",
-    "waiting_hint": "The bar widget starts it; if it is not there, run nan-usage doctor.",
+    "waiting": "Waiting for the first poll…",
+    "waiting_hint": "The poller runs inside Noctalia. If this stays empty, check the API key path in the settings.",
     "cached": "cached",
     "overall": "Overall",
     "recent": "{label}: {value}",

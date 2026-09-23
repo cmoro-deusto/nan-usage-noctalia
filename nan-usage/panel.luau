@@ -7,15 +7,32 @@
 -- list of cards on the left, the selected one's detail on the right, and the
 -- actions as icon buttons in the header rather than a footer.
 --
--- The panel paints the last record the widget received (its sibling publishes
--- them through noctalia.state), and the refresh button asks the tool for a new
--- one. It decides nothing itself: the levels, the projections and the text of
--- every caption come from the tool.
+-- The poller publishes what it read on the plugin's shared state, and shared.luau
+-- turns that into the record this file paints, so the panel decides nothing itself:
+-- levels, projections and the text of every caption come from the model. The
+-- refresh button asks the poller to go now.
 
-local command = noctalia.getConfig("command") or "nan-usage"
+local shared = require("./shared.luau")
+
 local iconStyle = noctalia.getConfig("icon_style") or "ghost"
 
--- The two alarm colours, the same ones the bar widget and the GTK popup use. The
+-- Read per render rather than once, so a change in the settings page lands without
+-- a reload.
+local function config()
+  return {
+    panelModel = noctalia.getConfig("panel_model") or "worst",
+    panelModelId = noctalia.getConfig("panel_model_id") or "deepseek-v4-flash",
+    gauge = noctalia.getConfig("panel_gauge") or "bar",
+    hideUnused = noctalia.getConfig("hide_unused") == true,
+    showMetrics = noctalia.getConfig("show_metrics") ~= false,
+    showPercentage = noctalia.getConfig("show_percentage") ~= false,
+    showReset = noctalia.getConfig("show_reset") ~= false,
+    showModel = noctalia.getConfig("show_model") ~= false,
+    pollSeconds = tonumber(noctalia.getConfig("interval")) or 60,
+  }
+end
+
+-- The two alarm colours, the same ones the bar widget uses. The
 -- healthy level keeps the theme's own colour. Surfaces and text come from the
 -- palette, so the panel tracks the theme.
 local COLOR_WARN = "#ff7800"
@@ -73,12 +90,6 @@ local function share(part, whole)
     return "0%"
   end
   return string.format("%d%%", math.floor(part / whole * 100 + 0.5))
-end
-
--- shellQuote is for the commands built below: runAsync passes a string through
--- the shell, so a configured path has to be quoted.
-local function shellQuote(text)
-  return "'" .. string.gsub(text, "'", "'\\''") .. "'"
 end
 
 -- merge is how the shared card style takes a per-card override; Luau has no
@@ -437,7 +448,7 @@ end
 local function detailColumn()
   if record == nil then
     return {
-      ui.label({ text = tr("panel.waiting", { command = command }), color = MUTED }),
+      ui.label({ text = tr("panel.waiting"), color = MUTED }),
       muted(tr("panel.waiting_hint")),
     }
   end
@@ -526,42 +537,33 @@ function onOpenSettings()
   noctalia.openSettings()
 end
 
--- A fresh record, asked for directly: the cache is shared, so this costs a
--- request only once the tool's own poll interval has passed.
+-- A fresh poll, asked for over the shared state channel: one VM cannot call into
+-- another, and the poller is the only part of the plugin that talks to NaN. It
+-- bypasses the poller's rate limit, so pressing this twice in a second is one
+-- request, not two.
 function onRefresh()
   if busy then
     return
   end
   busy = true
   render()
-  noctalia.runAsync(shellQuote(command) .. " json --force", function(result)
-    busy = false
-    if result.exitCode ~= 0 then
-      noctalia.log("NaN Usage panel: " .. command .. " json failed: " .. tostring(result.stderr))
-      render()
-      return
-    end
-    local decoded, err = noctalia.json.decode(result.stdout)
-    if decoded == nil then
-      noctalia.log("NaN Usage panel: unreadable record (" .. tostring(err) .. ")")
-      render()
-      return
-    end
-    record = decoded
-    -- The widget should show this too.
-    noctalia.state.set("report", decoded)
-    render()
-  end)
+  noctalia.state.set("refresh", os.time())
 end
 
 -- ----------------------------------------------------------------- lifecycle
 
--- The widget publishes each record it receives; opening the panel before the
--- first one is fine, and this fills it in as soon as it arrives.
-noctalia.state.watch("report", function(value)
-  record = value
+-- The poller publishes as soon as a poll lands; opening the panel before the first
+-- one is fine, and this fills it in as soon as it arrives.
+local function ingest(data)
+  record = nil
+  if data ~= nil then
+    record = shared.build(data, config(), os.time())
+    busy = false
+  end
   render()
-end)
+end
+
+noctalia.state.watch("data", ingest)
 
 function onOpen(_context)
   render()
@@ -570,7 +572,9 @@ function onOpen(_context)
   end
 end
 
-record = noctalia.state.get("report")
+-- The stored data is reused as-is: the model rebuilds the record from it with the
+-- current clock, so the countdowns are right even if the poll was a while ago.
+ingest(noctalia.state.get("data"))
 -- The selection lives in the plugin's shared state, so reopening the panel — or a
 -- reload — comes back to the model you were looking at.
 selected = noctalia.state.get("selected") or OVERALL
