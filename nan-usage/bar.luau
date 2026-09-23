@@ -60,10 +60,15 @@ local PANEL_ID = "cmoro-deusto/nan-usage:panel"
 -- them, because whether the shell's Qt build can render an SVG is not something to
 -- bet on. An image replaces the glyph — the API shows one or the other — so this
 -- wins over show_glyph.
+--
+-- 14 to sit with the glyphs around it: the widget next to this one on a bar draws its
+-- provider marks at size 14, and a mark drawn larger than its neighbours' reads as
+-- the odd one out. The rasters are 96px squares of a square viewBox, so the draw is
+-- neither stretched nor inset.
 local ICON_COLOR = "nan.png"
 local ICON_GHOST_ON_DARK = "nan-ghost-white.png"
 local ICON_GHOST_ON_LIGHT = "nan-ghost-black.png"
-local ICON_SIZE = 16
+local ICON_SIZE = 14
 
 -- The gauge. A bar widget draws one only through the declarative tree below:
 -- setText/setGlyph/setImage have no way to draw a bar, and ui.progress is the only
