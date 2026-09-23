@@ -26,7 +26,7 @@ license = "MIT"
 # is copied to the clipboard instead. Declared rather than left implicit, since the
 # submission template asks for every command a plugin shells out to.
 dependencies = ["gio", "xdg-open"]
-tags = ["bar", "panel", "ai", "indicator"]
+tags = ["bar", "panel", "ai", "indicator", "utility"]
 icon = "brain"
 description = "Your NaN (nan.builders) quota in the bar: usage per model, time to the reset, and a warning if the burn rate is risky."
 
