@@ -157,7 +157,11 @@ local function nodesFor(level, text, percent, gauge)
       radius = 3,
     }))
   end
-  table.insert(nodes, ui.label({ text = text, color = levelColor(level), fontSize = 13 }))
+  -- No fontSize on purpose: an unset size inherits the bar's own font and scale, so
+  -- this text sits exactly where the other widgets' text sits. Setting one made it a
+  -- couple of points larger than its neighbours, whose cap-line therefore rode higher
+  -- in the bar.
+  table.insert(nodes, ui.label({ text = text, color = levelColor(level) }))
   return nodes
 end
 

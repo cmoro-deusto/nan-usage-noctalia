@@ -409,6 +409,20 @@ eq(progress.props.fill, "#e01b24", "a critical level draws in the alarm colour")
 reset()
 journal.state.data = published
 load("bar.luau")
+local barLabel
+walk(journal.tree, function(node)
+  if node.type == "label" and barLabel == nil then
+    barLabel = node
+  end
+end)
+check(barLabel ~= nil and barLabel.props.fontSize == nil,
+  "the label sets no fontSize, so it inherits the bar's own font and sits like its neighbours")
+check(barLabel ~= nil and barLabel.props.baseline == nil,
+  "and no baseline either — the bar's default is what the other widgets use")
+
+reset()
+journal.state.data = published
+load("bar.luau")
 eq(#journal.commands, 0, "nothing is spawned to paint")
 env.onClick()
 eq(journal.toggledPanel, "cmoro-deusto/nan-usage:panel", "a click toggles this plugin's panel")
