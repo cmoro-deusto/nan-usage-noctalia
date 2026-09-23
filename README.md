@@ -1,42 +1,91 @@
-# Noctalia plugin: NaN Usage
+# NaN Usage — a Noctalia plugin
 
-A self-contained Noctalia plugin: a bar widget showing your NaN subscription
-quota, and a panel with the per-model detail behind it. It calls the NaN cloud API
-itself, so nothing has to be installed and no command has to be on `PATH`.
+Your NaN (nan.builders) subscription quota in the Noctalia bar: a bar widget showing
+the model that is worst off — its percentage, the time to the reset, and a colour that
+follows the burn rate rather than the percentage alone — with a panel of per-model
+detail behind it. It talks to NaN's cloud API itself, so nothing has to be installed
+and no command has to be on `PATH`.
 
-`nan-usage/` is the plugin: its id is `cmoro-deusto/nan-usage`, and the directory
-is named after the part after the slash, which is the layout a Noctalia plugin
-source has to have. The repository root is therefore
-a usable source, and the plugin can be dropped into a store submission as it
-stands.
+`nan-usage/` is the plugin. Its id is `cmoro-deusto/nan-usage`, and the directory is
+named after the part of the id after the slash — the layout a plugin *source* has to
+have, and what makes this repository installable as one.
 
-## Using it
+## Installing it
 
-As a source, so Noctalia owns the plugin — it can update and remove it:
+### As a source, which is the one to use
+
+Noctalia then owns the plugin, so it can update and remove it:
 
 ```sh
-noctalia msg plugins source add nan-usage path "$PWD"
+noctalia msg plugins source add nan-usage git https://github.com/cmoro-deusto/nan-usage-noctalia
+noctalia msg plugins enable cmoro-deusto/nan-usage
 ```
 
-Or as a drop-in, which is the documented development path: Noctalia scans
-`~/.local/share/noctalia/plugins/` read-only, so there is no uninstall action and
-the files stay yours.
+The repository *is* the source; `nan-usage/` inside it is the plugin. To update later,
+**Settings → Plugins** → the source's Update.
+
+### From a local checkout
+
+The same thing pointed at a directory you edit, which is how to work on the plugin:
+
+```sh
+cd /path/to/nan-usage-noctalia
+noctalia msg plugins source add nan-usage path "$PWD"
+noctalia msg plugins enable cmoro-deusto/nan-usage
+```
+
+`.luau` edits hot-reload; manifest changes are read on the next configuration reload,
+which toggling the plugin forces.
+
+### As a drop-in, with no source at all
+
+Noctalia scans `~/.local/share/noctalia/plugins/` read-only, so there is no uninstall
+action and the files stay yours:
 
 ```sh
 cp -r nan-usage ~/.local/share/noctalia/plugins/
 ```
 
-Either way, enable it in **Settings → Plugins** and then add the widget from the
-bar's widget picker. `.luau` edits hot-reload; manifest changes are read on the
-next configuration reload, which toggling the plugin forces.
+Then enable it in **Settings → Plugins**.
 
-## Tests
+### After installing, either way
+
+Add the widget from the bar's widget picker, and open the panel from anywhere,
+including a compositor key binding:
+
+```sh
+noctalia msg panel-toggle cmoro-deusto/nan-usage:panel
+```
+
+It needs a NaN API key at `~/.config/nan/api-key` — the same file NaN's own `nan`
+command line tool reads, so if you already use that there is nothing to do. Another
+path can be set in the plugin's settings. Without a key the widget shows a dash and
+the tooltip says which file it wanted.
+
+If your Noctalia's store already lists `cmoro-deusto/nan-usage`, that is the same
+plugin, and installing it from there keeps it updated with the rest of your plugins.
+
+## Updating and removing it
+
+- **From a git source**: the source's Update in **Settings → Plugins**, then a
+  configuration reload if the manifest changed.
+- **Removing**: disable the plugin, then remove the source, or delete
+  `~/.local/share/noctalia/plugins/nan-usage/` if you dropped it in by hand.
+
+## The plugin's own page
+
+`nan-usage/README.md` is the page written for someone deciding whether to enable the
+plugin: what the colours mean, every setting, and everything it touches — three GETs
+to NaN's API per poll, one file read and none written, and one spawned command, only
+when the panel's link button is pressed.
+
+## Working on the plugin
 
 ```sh
 make test
 ```
 
-which is the three checks in `nan-usage/tests/`:
+which runs the three checks in `nan-usage/tests/`:
 
 - `shared_test.lua` is the model on its own — levels, projections and every text,
   exactly, under a fixed clock — with no host and no stubs at all, because the model
@@ -58,6 +107,11 @@ invisible to reading — a first line Luau rejects while `luac` accepts it, a `l
 function called above its own definition, a prop the host keeps because the next
 render did not set it.
 
+Two things that are easy to get wrong when editing it: bump `version` in
+`plugin.toml` on **every** change, and write `translations/en.json` as nested
+objects — a dotted key would be rewritten on the next i18n sync, so `a.b` as a key
+silently churns.
+
 ## The icons
 
 `nan-usage/nan.svg` is the source of the three rasters the plugin draws — the coloured
@@ -68,33 +122,6 @@ changing the SVG; it writes into `nan-usage/`, which is where the plugin ships t
 They are rasters because whether a Qt build can render SVG depends on its image
 plugins being installed, and an icon that silently fails to appear is worse than a
 slightly larger file.
-
-## Publishing to the store
-
-The store's CI validates a plugin on every push, and its own validator can be run
-locally from a checkout of the community plugin repository:
-
-```sh
-python3 .github/workflows/scripts/validate-plugins.py --help
-```
-
-With this repository's `nan-usage/` copied in as a top-level directory, that script
-passes. What it and the review then expect:
-
-- `version` is semver and gets bumped on **every** change; `plugin_api` is the
-  oldest Noctalia API level the plugin needs (22 here, so the three entries can
-  `require` the shared model; 15 of that is `noctalia.openSettings`)
-  and only moves up when a newer capability is adopted.
-- `description` stays within 120 characters, and `tags` come from the allowed list
-  (`bar`, `panel`, `ai`, `indicator` here).
-- Translation keys live in `translations/en.json` as **nested objects**: a dotted
-  key would be rewritten into objects on the next i18n sync, so `a.b` as a key
-  silently churns. Lookups stay dotted (`noctalia.tr("panel.title")`).
-- `thumbnail.webp` is 960×540 and under 512 KiB, exported from a screenshot of the
-  panel through the store's generator.
-- `license = "MIT"` in the manifest, which is the store's default and needs no
-  `LICENSE` file inside the plugin directory.
-- `catalog.toml` is generated by their CI: never add or edit one in a pull request.
 
 ## License
 
