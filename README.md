@@ -3,8 +3,9 @@
 The Noctalia plugin for the `nan-usage` command line tool: a bar widget showing
 your NaN subscription quota, and a panel with the per-model detail behind it.
 
-`quota/` is the plugin — the name is the part of its id after the slash, which is
-the layout a Noctalia plugin source has to have. The repository root is therefore
+`nan-usage/` is the plugin: its id is `cmoro-deusto/nan-usage`, and the directory
+is named after the part after the slash, which is the layout a Noctalia plugin
+source has to have. The repository root is therefore
 a usable source, and the plugin can be dropped into a store submission as it
 stands.
 
@@ -34,7 +35,7 @@ next configuration reload, which toggling the plugin forces.
 make test
 ```
 
-which is the two checks in `quota/tests/`:
+which is the two checks in `nan-usage/tests/`:
 
 - `plugin_test.lua` executes `bar.luau` and `panel.luau` against stubs of the
   Noctalia API and drives them — a record, a failed record, an unreadable one, a
@@ -54,9 +55,9 @@ render did not set it.
 
 ## The icons
 
-`quota/nan.svg` is the source of the three rasters the plugin draws — the coloured
+`nan-usage/nan.svg` is the source of the three rasters the plugin draws — the coloured
 mark and a black-on-white/white-on-black ghost pair for the theme. Regenerate them
-with `quota/generate-icons.sh` (needs `rsvg-convert`) after changing the SVG.
+with `nan-usage/generate-icons.sh` (needs `rsvg-convert`) after changing the SVG.
 
 They are rasters because whether a Qt build can render SVG depends on its image
 plugins being installed, and an icon that silently fails to appear is worse than a
@@ -71,7 +72,7 @@ locally from a checkout of the community plugin repository:
 python3 .github/workflows/scripts/validate-plugins.py --help
 ```
 
-With this repository's `quota/` copied in as a top-level directory, that script
+With this repository's `nan-usage/` copied in as a top-level directory, that script
 passes. What it and the review then expect:
 
 - `version` is semver and gets bumped on **every** change; `plugin_api` is the

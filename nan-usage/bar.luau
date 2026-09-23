@@ -23,7 +23,7 @@ local leftClick = noctalia.getConfig("left_click") or "panel"
 local iconStyle = noctalia.getConfig("icon_style") or "ghost"
 
 -- The panel this plugin owns, addressed the way Noctalia names entries.
-local PANEL_ID = "nan-usage/quota:panel"
+local PANEL_ID = "cmoro-deusto/nan-usage:panel"
 
 -- The NaN logo, next to this file. The PNGs are rasterised
 -- from the SVG beside them, because whether the shell's Qt build can render an SVG

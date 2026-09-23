@@ -706,7 +706,7 @@ if load("bar.luau") then
     end
     attempt("update()", function() env.update() end)
     attempt("onClick()", function() env.onClick() end)
-    check(journal.toggledPanel == "nan-usage/quota:panel",
+    check(journal.toggledPanel == "cmoro-deusto/nan-usage:panel",
       "clicking opens the plugin's own panel (" .. tostring(journal.toggledPanel) .. ")")
   end
 end

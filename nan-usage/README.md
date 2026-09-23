@@ -5,14 +5,14 @@ loaded the worst model is, the time until its reset, and a colour when the burn
 rate is heading for trouble. The panel behind the widget shows one bar per model,
 where the period's tokens went, and the account's aggregate consumption.
 
-It is a front end to `nan-usage`: the plugin runs that command line tool, paints
+It is a front end to the `nan-usage` command line tool: the plugin runs it, paints
 what it prints, and decides nothing itself.
 
 ## Plugin
 
 | Field | Value |
 | --- | --- |
-| ID | `nan-usage/quota` |
+| ID | `cmoro-deusto/nan-usage` |
 | Entries | Bar widget: `bar`; panel: `panel` |
 
 ## Requirements
@@ -51,7 +51,7 @@ burn rate.
 Open the panel from anywhere, including a compositor key binding:
 
 ```sh
-noctalia msg panel-toggle nan-usage/quota:panel
+noctalia msg panel-toggle cmoro-deusto/nan-usage:panel
 ```
 
 ## Settings

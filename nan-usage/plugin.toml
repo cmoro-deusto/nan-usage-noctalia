@@ -9,14 +9,14 @@
 # lets Noctalia own the plugin — update and remove it — rather than merely read a
 # directory it was handed.
 
-id = "nan-usage/quota"
+id = "cmoro-deusto/nan-usage"
 name = "NaN Usage"
 version = "1.0.0"
 # 15 is what noctalia.openSettings() needs, for the cog in the panel's header.
 plugin_api = 15
-# The first half of every entry id ("nan-usage/quota:bar"), so it has to stay put
-# once someone has the widget on their bar.
-author = "nan-usage"
+# The first half of every entry id ("cmoro-deusto/nan-usage:bar"), so it has to
+# stay put once someone has the widget on their bar.
+author = "cmoro-deusto"
 license = "MIT"
 dependencies = ["nan-usage"]
 tags = ["bar", "panel", "ai", "indicator"]
@@ -100,7 +100,7 @@ entry = "bar.luau"
 
 # The detail view. Noctalia places it (attached to the bar, near whatever opened
 # it), so this needs no compositor configuration: open it from the bar widget,
-# from the cog, or with `noctalia msg panel-toggle nan-usage/quota:panel`.
+# from the cog, or with `noctalia msg panel-toggle cmoro-deusto/nan-usage:panel`.
 [[panel]]
 id = "panel"
 entry = "panel.luau"
