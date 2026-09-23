@@ -3,7 +3,7 @@
 The format loosely follows [Keep a Changelog](https://keepachangelog.com/), and
 the project uses [semantic versioning](https://semver.org/).
 
-## [1.0.0]
+## [1.0.0] — 2026-09-23
 
 First release.
 
