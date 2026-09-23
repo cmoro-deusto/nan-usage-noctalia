@@ -44,6 +44,8 @@ local PLUGIN = root .. "/.."
 -- README. Two models, so a click has somewhere to move to.
 local function record(overrides)
   local base = {
+    -- The *tool's* JSON contract version, part of every record it prints — not
+    -- this plugin's version, which lives in plugin.toml alone.
     version = 1,
     ok = true,
     stale = false,
