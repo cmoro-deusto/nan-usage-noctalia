@@ -2,32 +2,32 @@
   "settings": {
     "api_key": {
       "label": "API key file",
-      "description": "The file holding your NaN API key, the same one the nan command line tool reads. It is sent to cloud-api.nan.builders and nowhere else."
+      "description": "The file holding your NaN API key."
     },
     "interval": {
       "label": "Poll interval (seconds)",
-      "description": "How often the NaN API is asked. The quota moves slowly, so five minutes is plenty; the countdowns move between polls on their own."
+      "description": "Seconds between requests to the NaN API."
     },
     "panel_model": {
       "label": "Which model the bar shows",
-      "description": "The bar has room for one model. Worst ranks by how alarming the burn rate is, then by usage; Fullest goes by usage alone; Fixed pins one model id.",
+      "description": "Which model the bar reflects.",
       "worst": "The most alarming",
       "max": "The fullest",
       "fixed": "A pinned model"
     },
     "panel_model_id": {
       "label": "Pinned model",
-      "description": "The model id the bar shows when Which model the bar shows is a pinned model, exactly as the API spells it (deepseek-v4-flash)."
+      "description": "The model id to pin, spelled as the API does (deepseek-v4-flash)."
     },
     "panel_gauge": {
       "label": "Gauge",
-      "description": "Noctalia draws no arc in a bar, so a ring is not offered — the bar is the only gauge it renders there. The panel draws its own.",
+      "description": "Draw a bar beside the text, or nothing at all.",
       "bar": "A bar",
       "none": "No gauge, text only"
     },
     "show_percentage": {
       "label": "Show the percentage",
-      "description": "The usage figure in the bar, as a whole number. Below 10% it keeps one decimal in the panel's captions."
+      "description": "The usage figure in the bar."
     },
     "show_reset": {
       "label": "Show the countdown",
@@ -39,7 +39,7 @@
     },
     "hide_unused": {
       "label": "Hide unused models",
-      "description": "Drop models with no usage from the panel's list. A pinned model stays, so it can still be inspected."
+      "description": "Drop models with no usage from the panel's list."
     },
     "show_metrics": {
       "label": "Show consumption totals",
@@ -47,11 +47,11 @@
     },
     "show_icon": {
       "label": "Show the NaN logo",
-      "description": "Draw the NaN logo before the text. It replaces the glyph; if it does not appear, this Qt build has no SVG image support, so use the glyph instead."
+      "description": "Draw the NaN logo before the text."
     },
     "icon_style": {
       "label": "Logo style",
-      "description": "Ghost draws the mark in the theme's own ink, which sits in a row of glyphs; Color draws it as NaN does.",
+      "description": "Ghost draws the mark in the theme's own ink, white on a dark theme and black on a light one; color draws it as NaN does.",
       "ghost": "Ghost (themed)",
       "color": "Colour"
     },
@@ -69,13 +69,13 @@
     },
     "left_click": {
       "label": "What a left click does",
-      "description": "Open Noctalia's own panel for this plugin (no compositor configuration needed), or do nothing. A right click opens these settings.",
+      "description": "Open the panel, or do nothing. A right click opens these settings.",
       "panel": "Open the panel",
       "nothing": "Nothing"
     },
     "site_action": {
       "label": "What the link button does",
-      "description": "Open NaN's dashboard in your browser, through gio or xdg-open, or copy the address instead. With neither opener installed the address is copied either way.",
+      "description": "Open NaN's dashboard in your browser, through gio or xdg-open, or copy the address instead.",
       "open": "Open in the browser",
       "copy": "Copy the address"
     }

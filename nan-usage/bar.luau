@@ -70,10 +70,7 @@ local ICON_GHOST_ON_DARK = "nan-ghost-white.png"
 local ICON_GHOST_ON_LIGHT = "nan-ghost-black.png"
 local ICON_SIZE = 14
 
--- The gauge. A bar widget draws one only through the declarative tree below:
--- setText/setGlyph/setImage have no way to draw a bar, and ui.progress is the only
--- gauge Noctalia renders in a bar — there is no arc primitive, so there is no ring
--- setting either. See the plugin README.
+-- The gauge, as a bar: ui.progress is the control a bar widget renders a level with.
 local GAUGE_WIDTH = 34
 local GAUGE_HEIGHT = 5
 

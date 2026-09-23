@@ -113,7 +113,8 @@ own cog.
   reason for every failure, both prefixed `NaN Usage` — grep Noctalia's log for that
   (where it writes one depends on how the shell was started on your setup). Noctalia
   also logs every prop or control it skips. If the bar shows a dash, the tooltip
-  names the reason first.
+  names the reason first, and if the NaN mark never appears this Qt build has no
+  image support — set `icon_style` to a glyph instead.
 - **Community project, not official**: not affiliated with or endorsed by
   nan.builders. "NaN" and its logo belong to their owners, and the logo shipped here
   — the SVG the rasters are drawn from — derives from their public favicon.
