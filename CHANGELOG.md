@@ -3,7 +3,7 @@
 The format loosely follows [Keep a Changelog](https://keepachangelog.com/), and
 the project uses [semantic versioning](https://semver.org/).
 
-## [1.0.0] - 2026-09-23
+## [1.0.0] — 2026-09-23
 
 First release.
 
@@ -14,13 +14,13 @@ First release.
   average burn rate projects past 75 % at the reset, red when it would exhaust the
   quota with a lockout of at least a tenth of the period.
 - **A panel** with the account's aggregate consumption as one bar per period, each
-  model's share of the period's tokens, and, for each model, the percentage, the
+  model's share of the period's tokens, and — per model — the percentage, the
   tokens used against the cap, the time to the reset and the reading of its burn
   rate. Noctalia places it, so it needs no compositor configuration.
 - **Values in the tooltip**, one line per model and per consumption period.
 - **The dashboard address is copied, not opened**: an opener would mean spawning
   `gio` or `xdg-open`, and the plugin starts no process.
-- The logo as a themed ghost, in white or black ink to match the shell's mode, or
+- The logo as a themed ghost — white or black ink to match the shell's mode — or
   the coloured mark, from rasters generated out of one SVG.
 - **Self-contained.** The plugin owns the API key, polls `cloud-api.nan.builders`
   itself, keeps what it reads in memory and writes no file. The only command it
