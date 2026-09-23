@@ -103,6 +103,10 @@ nan-usage config set panel_gauge bar     # ring, bar or none
   `grep -i 'NaN Usage' ~/.cache/noctalia/noctalia.log`, then `nan-usage doctor`.
 - **The plugin is optional to the tool.** Nothing here changes what the command
   line tool, its popup or its settings window do; they work with Noctalia absent.
+- **Community project, not official**: not affiliated with or endorsed by
+  nan.builders. "NaN" and its logo belong to their owners, and the logo shipped
+  here — the SVG the rasters are drawn from — derives from their public favicon.
+  MIT-licensed.
 
 ## Tests
 

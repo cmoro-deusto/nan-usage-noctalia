@@ -17,7 +17,7 @@ plugin_api = 15
 # The first half of every entry id ("nan-usage/quota:bar"), so it has to stay put
 # once someone has the widget on their bar.
 author = "nan-usage"
-license = "GPL-2.0-or-later"
+license = "MIT"
 dependencies = ["nan-usage"]
 tags = ["bar", "panel", "ai", "indicator"]
 icon = "brain"

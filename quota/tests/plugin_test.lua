@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: GPL-2.0-or-later
+-- SPDX-License-Identifier: MIT
 --
 -- Run the plugin's scripts for real, against stubs of the Noctalia API.
 --

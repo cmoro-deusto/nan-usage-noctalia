@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: MIT
 """Check the Noctalia plugin for the mistakes Noctalia would only tell you at runtime.
 
 This is not a substitute for running the thing — it cannot tell you whether the
