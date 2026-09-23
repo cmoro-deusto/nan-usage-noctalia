@@ -22,7 +22,7 @@ Or as a drop-in, which is the documented development path: Noctalia scans
 the files stay yours.
 
 ```sh
-cp -r quota ~/.local/share/noctalia/plugins/
+cp -r nan-usage ~/.local/share/noctalia/plugins/
 ```
 
 Either way, enable it in **Settings → Plugins** and then add the widget from the
