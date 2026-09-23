@@ -10,6 +10,21 @@ and no command has to be on `PATH`.
 named after the part of the id after the slash — the layout a plugin *source* has to
 have, and what makes this repository installable as one.
 
+![The panel: consumption per period, each model's share of it, and the detail behind the selected row](screenshots/panel.png)
+
+## The widget in the bar
+
+The bar has room for one model — the one worst off — its usage, and the time to the
+reset, coloured by how alarming the burn rate is rather than by the percentage alone:
+
+![The bar widget: the NaN mark, the usage percentage, and the time to the reset](screenshots/bar.png)
+
+Hovering it lists the values instead, one line per model with tokens used against the
+cap and the time to the reset, then one line per period — short enough to read without
+leaving the bar:
+
+![The tooltip: a line per model with tokens against the cap, and a line per period](screenshots/tooltip.png)
+
 ## Installing it
 
 ### As a source, which is the one to use
