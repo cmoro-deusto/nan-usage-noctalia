@@ -115,9 +115,11 @@ own cog.
 - **When something is wrong** the last good numbers stay on the bar and the tooltip
   says so, together with the reason: a missing key, a rejected key, an unreachable
   API, or an answer that could not be read.
-- **Debugging.** Noctalia logs every prop or control it skips; add the plugin's own
-  lines with `grep -i 'NaN Usage' ~/.cache/noctalia/noctalia.log`. If the bar shows
-  a dash, the tooltip names the reason.
+- **Debugging.** The panel logs one line when it loads and the service logs the
+  reason for every failure, both prefixed `NaN Usage` — grep Noctalia's log for that
+  (where it writes one depends on how the shell was started on your setup). Noctalia
+  also logs every prop or control it skips. If the bar shows a dash, the tooltip
+  names the reason first.
 - **Community project, not official**: not affiliated with or endorsed by
   nan.builders. "NaN" and its logo belong to their owners, and the logo shipped here
   — the SVG the rasters are drawn from — derives from their public favicon.
