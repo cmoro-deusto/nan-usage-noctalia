@@ -1,0 +1,60 @@
+{
+  "settings": {
+    "command": {
+      "label": "Command",
+      "description": "The nan-usage executable. Give it an absolute path if the shell Noctalia spawns cannot reach it."
+    },
+    "interval": {
+      "label": "Redraw interval (seconds)",
+      "description": "How often the tool prints a record. It polls the NaN API on its own schedule (poll_seconds in its own configuration); this only decides how often the countdown is redrawn."
+    },
+    "show_icon": {
+      "label": "Show the NaN logo",
+      "description": "Draw the NaN logo before the text. It replaces the glyph; if it does not appear, this Qt build has no SVG image support, so use the glyph instead."
+    },
+    "show_glyph": {
+      "label": "Show a glyph",
+      "description": "Draw a glyph before the text."
+    },
+    "glyph": {
+      "label": "Glyph",
+      "description": "The glyph to draw when Show a glyph is on."
+    },
+    "show_tooltip": {
+      "label": "Details in the tooltip",
+      "description": "Show a line per model, with tokens used against the cap and the projection, when you hover the widget."
+    },
+    "left_click": {
+      "label": "What a left click does",
+      "description": "Open Noctalia's own panel for this plugin (no compositor configuration needed), open the GTK popup window instead, or do nothing.",
+      "panel": "Open the panel",
+      "popup": "Open the GTK popup",
+      "nothing": "Nothing"
+    },
+    "icon_style": {
+      "label": "Logo style",
+      "description": "Ghost draws the mark in the theme's own ink, which sits in a row of glyphs; Color draws it as NaN does.",
+      "ghost": "Ghost (themed)",
+      "color": "Colour"
+    }
+  },
+  "panel": {
+    "title": "NaN Usage",
+    "period": "Period",
+    "consumption": "Consumption",
+    "tooltip_refresh": "Refresh now",
+    "tooltip_settings": "Settings",
+    "tooltip_site": "Open the NaN panel (cloud.nan.builders)",
+    "resets_in": "resets in {when}",
+    "open_failed": "Could not open the NaN panel",
+    "no_opener": "No program to open a link with: install xdg-utils (or gio from glib2)",
+    "no_usage": "No usage in this period",
+    "no_data": "No data yet",
+    "waiting": "Waiting for {command}…",
+    "waiting_hint": "The bar widget starts it; if it is not there, run nan-usage doctor.",
+    "cached": "cached",
+    "overall": "Overall",
+    "recent": "{label}: {value}",
+    "contributions": "Where it went"
+  }
+}

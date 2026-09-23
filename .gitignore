@@ -1,0 +1,7 @@
+# Python bytecode from tests/plugin_check.py
+__pycache__/
+*.pyc
+
+# The plugin API definitions, fetched for editor autocomplete (see the README of
+# the community plugin repository): a snapshot, not something to commit.
+noctalia.d.luau

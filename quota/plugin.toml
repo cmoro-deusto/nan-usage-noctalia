@@ -1,0 +1,111 @@
+# NaN Usage — Noctalia v5+ plugin: a bar widget and the panel behind it.
+#
+# Optional adapter: the tool itself knows nothing about Noctalia. This plugin
+# only runs `nan-usage watch --json` and paints fields of what comes back, so the
+# project works exactly the same with it installed or not.
+#
+# The repository root is a plugin *source*: this directory is named after the part
+# of the id that follows the slash, which is the layout a source has to have. That
+# lets Noctalia own the plugin — update and remove it — rather than merely read a
+# directory it was handed.
+
+id = "nan-usage/quota"
+name = "NaN Usage"
+version = "0.1.0"
+# 15 is what noctalia.openSettings() needs, for the cog in the panel's header.
+plugin_api = 15
+# The first half of every entry id ("nan-usage/quota:bar"), so it has to stay put
+# once someone has the widget on their bar.
+author = "nan-usage"
+license = "GPL-2.0-or-later"
+dependencies = ["nan-usage"]
+tags = ["bar", "panel", "ai", "indicator"]
+icon = "brain"
+description = "Your NaN (nan.builders) quota in the bar: usage per model, time to the reset, and a warning if the burn rate is risky."
+
+# Settings are plugin-level, which is what puts them behind the cog: the panel's
+# header opens this page, and the bar widget reads the same values through
+# noctalia.getConfig().
+
+[[setting]]
+key = "command"
+type = "string"
+label_key = "settings.command.label"
+description_key = "settings.command.description"
+default = "nan-usage"
+
+[[setting]]
+key = "left_click"
+type = "select"
+label_key = "settings.left_click.label"
+description_key = "settings.left_click.description"
+default = "panel"
+options = [
+  { value = "panel", label_key = "settings.left_click.panel" },
+  { value = "popup", label_key = "settings.left_click.popup" },
+  { value = "nothing", label_key = "settings.left_click.nothing" },
+]
+
+[[setting]]
+key = "interval"
+type = "int"
+label_key = "settings.interval.label"
+description_key = "settings.interval.description"
+default = 60
+min = 15
+max = 1800
+
+[[setting]]
+key = "show_icon"
+type = "bool"
+label_key = "settings.show_icon.label"
+description_key = "settings.show_icon.description"
+default = true
+
+[[setting]]
+key = "icon_style"
+type = "select"
+label_key = "settings.icon_style.label"
+description_key = "settings.icon_style.description"
+default = "ghost"
+options = [
+  { value = "ghost", label_key = "settings.icon_style.ghost" },
+  { value = "color", label_key = "settings.icon_style.color" },
+]
+
+[[setting]]
+key = "show_glyph"
+type = "bool"
+label_key = "settings.show_glyph.label"
+description_key = "settings.show_glyph.description"
+default = false
+
+[[setting]]
+key = "glyph"
+type = "glyph"
+label_key = "settings.glyph.label"
+description_key = "settings.glyph.description"
+default = "chart-pie"
+
+[[setting]]
+key = "show_tooltip"
+type = "bool"
+label_key = "settings.show_tooltip.label"
+description_key = "settings.show_tooltip.description"
+default = true
+
+[[widget]]
+id = "bar"
+entry = "bar.luau"
+
+# The detail view. Noctalia places it (attached to the bar, near whatever opened
+# it), so this needs no compositor configuration: open it from the bar widget,
+# from the cog, or with `noctalia msg panel-toggle nan-usage/quota:panel`.
+[[panel]]
+id = "panel"
+entry = "panel.luau"
+width = 820
+height = 520
+placement = "attached"
+position = "auto"
+open_near_click = true
