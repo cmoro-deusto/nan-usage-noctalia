@@ -11,7 +11,7 @@
 
 id = "nan-usage/quota"
 name = "NaN Usage"
-version = "0.1.0"
+version = "1.0.0"
 # 15 is what noctalia.openSettings() needs, for the cog in the panel's header.
 plugin_api = 15
 # The first half of every entry id ("nan-usage/quota:bar"), so it has to stay put
