@@ -52,7 +52,9 @@ the credits used, left and in packs with the pace drawn ahead of them, the token
 split into new input, cached input and output with the cache share, credits per day,
 and each model's share. For a model: its credits and requests, its token split, an
 estimate of its credits split by token type, its credits per day, and its prices per
-1M tokens of each type.
+1M tokens of each type. When the subscription is paused, or the credits and packs are
+spent, a banner says so first, with a button to NaN's dashboard or to buy a credit
+pack.
 
 Open the panel from anywhere, including a compositor key binding:
 
@@ -93,9 +95,10 @@ own cog.
   memory only, so a reload starts from nothing and shows a dash until the first
   request lands.
 - **Files written.** None.
-- **Processes spawned.** Only when you press a link button: `gio open` or
-  `xdg-open`, whichever exists, to hand NaN's dashboard to your browser. With
-  neither installed the address is copied instead. Nothing else in the plugin starts
+- **Processes spawned.** Only when you press one of the panel's link buttons (NaN's
+  dashboard, and "Buy a credit pack" when you are out of credits): `gio open` or
+  `xdg-open`, whichever exists, to hand the page to your browser. With neither
+  installed the address is copied instead. Nothing else in the plugin starts
   a process, and no command has to be on `PATH` for the widget or the panel to work.
 - **The credit split by token type is an estimate.** NaN reports one credit figure
   per model per day. The split applies NaN's per-model prices for new input, cached
@@ -121,8 +124,10 @@ own cog.
   reason for every failure, both prefixed `NaN Usage`. Grep Noctalia's log for that
   (where it writes one depends on how the shell was started on your setup). Noctalia
   also logs every prop or control it skips. If the bar shows a dash, the tooltip
-  names the reason first, and if the NaN mark never appears this Qt build has no
-  image support: set `icon_style` to a glyph instead.
+  names the reason first. If the NaN mark never appears, this Qt build has no image
+  support: turn `show_icon` off and `show_glyph` on, and pick a gauge that is not an
+  image (`bar`, `battery` or `sparkline`), since the ring and the segments are images
+  too.
 - **Community project, not official**: not affiliated with or endorsed by
   nan.builders. "NaN" and its logo belong to their owners, and the logo shipped here,
   the SVG the rasters are drawn from, derives from their public favicon.
@@ -146,9 +151,9 @@ The second drives the real `service.luau`, `bar.luau` and `panel.luau` under a f
 clock: that the poller reads the key, asks `/v1/usage` and nothing else, follows a
 second page, publishes what came back and keeps the last good numbers when a poll
 fails; that the widget and the panel paint that data, with every gauge and every
-gauge raster it can ask for; that the only thing ever
-spawned is the browser opener, and only when a link button is pressed; and that a
-refresh is asked for over the shared state channel rather than by running a program.
+gauge raster it can ask for; that the only thing ever spawned is the browser opener,
+and only when a link button is pressed; and that a refresh is asked for over the
+shared state channel rather than by running a program.
 
 The third is static, and needs Python 3.11 or newer for its TOML reader: the
 manifest against its own translation keys, the plugin directory against its id, and
