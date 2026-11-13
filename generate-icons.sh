@@ -59,7 +59,7 @@ printf '\nAll three are drawn from nan.svg at %sx%s px.\n' "$SIZE" "$SIZE"
 # recoloured at runtime, so each colour a gauge takes (the theme's ink, amber, red)
 # is a set of its own, on a dark theme and on a light one, where the track differs.
 #
-#   gauges/ring-<theme>-<level>-<step>.png    step: 0, 5, 10 … 100 (percent)
+#   gauges/ring-<theme>-<level>-<step>.png    step: 0, 10, 20 … 100 (percent)
 #   gauges/seg10-<theme>-<level>-<lit>.png    lit:  0 … 10 cells
 #   gauges/seg5-<theme>-<level>-<lit>.png     lit:  0 … 5 cells
 #
@@ -70,7 +70,9 @@ mkdir -p "$GAUGES"
 
 ring() {
     local theme="$1" level="$2" colour="$3" track="$4" step dash
-    for step in $(seq 0 5 100); do
+    # 10% steps, not finer: the community repository caps a plugin at 200 files, and
+    # every step is six rasters.
+    for step in $(seq 0 10 100); do
         # The circumference of r = 11, and the share of it this step fills.
         dash=$(awk -v s="$step" 'BEGIN { printf "%.3f", 2 * 3.14159265 * 11 * s / 100 }')
         {

@@ -156,7 +156,7 @@ plugin's version for new prices like for any other change.
 
 `nan-usage/nan.svg` is the source of the three logo rasters the plugin draws: the
 coloured mark, and a black-on-white and white-on-black ghost pair for the theme. The
-same script draws the ring and segment gauges into `nan-usage/gauges/`: a ring per 5%
+same script draws the ring and segment gauges into `nan-usage/gauges/`: a ring per 10%
 step and a bar per number of lit cells, in the theme's ink, amber and red, for a dark
 and a light theme. Regenerate them all with `./generate-icons.sh` at the repository
 root. It needs `rsvg-convert`, and it writes into `nan-usage/`, which is where the

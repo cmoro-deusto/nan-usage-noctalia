@@ -74,7 +74,7 @@ local ICON_SIZE = 14
 
 -- The gauges `panel_gauge` offers. bar: ui.progress, the control a bar widget renders a
 -- level with. segments10 and segments5: cells that light up, one per 10% or 20%, and
--- ring: a ring filling by 5% steps, both drawn from the rasters in gauges/ (see
+-- ring: a ring filling by 10% steps, both drawn from the rasters in gauges/ (see
 -- generate-icons.sh for why they are rasters). battery: Noctalia's battery glyph, draining by quarters as the
 -- credits go. sparkline: the period's credits per day, a trend rather than a level.
 local GAUGE_WIDTH = 34
@@ -255,12 +255,12 @@ local function segmentsFile(count, level, percent)
   return "gauges/seg" .. count .. "-" .. gaugeTheme() .. "-" .. (level or "ok") .. "-" .. lit .. ".png"
 end
 
--- The ring raster for a level, in the 5% step nearest the usage, and never empty
+-- The ring raster for a level, in the 10% step nearest the usage, and never empty
 -- once the period has any.
 local function ringFile(level, percent)
-  local step = math.floor(math.max(0, math.min(percent, 100)) / 5 + 0.5) * 5
+  local step = math.floor(math.max(0, math.min(percent, 100)) / 10 + 0.5) * 10
   if percent > 0 and step == 0 then
-    step = 5
+    step = 10
   end
   return "gauges/ring-" .. gaugeTheme() .. "-" .. (level or "ok") .. "-" .. step .. ".png"
 end

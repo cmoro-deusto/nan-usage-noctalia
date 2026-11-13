@@ -32,7 +32,7 @@ license = "MIT"
 dependencies = ["xdg-open"]
 tags = ["bar", "panel", "ai", "indicator", "utility"]
 icon = "brain"
-description = "Your NaN (nan.builders) credits in the bar: the period's allowance used, the cache share, where the credits went, and a warning if the pace is risky."
+description = "Your NaN (nan.builders) credits in the bar: allowance used, cache share, where the credits went, and pace warnings."
 
 # Settings are plugin-level, which is what puts them behind the cog: the panel's
 # header opens this page, and both surfaces read the same values.

@@ -528,7 +528,7 @@ end
 eq(gaugeImage(gaugeWith("segments10")), "gauges/seg10-dark-ok-4.png", "segments10 lights four of ten cells at 40%")
 eq(gaugeImage(gaugeWith("segments5")), "gauges/seg5-dark-ok-2.png", "segments5 lights two of five")
 eq(gaugeImage(gaugeWith("ring")), "gauges/ring-dark-ok-40.png", "the ring fills to the 40% step in the theme's ink")
-eq(gaugeImage(gaugeWith("ring", { usage = CRITICAL, fetchedAt = NOW, error = "" }, false)), "gauges/ring-light-crit-95.png",
+eq(gaugeImage(gaugeWith("ring", { usage = CRITICAL, fetchedAt = NOW, error = "" }, false)), "gauges/ring-light-crit-90.png",
   "and in red on a light theme when critical")
 local missing = {}
 local function expect(name)
@@ -541,7 +541,7 @@ local function expect(name)
 end
 for _, theme in ipairs({ "dark", "light" }) do
   for _, level in ipairs({ "ok", "warn", "crit" }) do
-    for step = 0, 100, 5 do
+    for step = 0, 100, 10 do
       expect("ring-" .. theme .. "-" .. level .. "-" .. step .. ".png")
     end
     for lit = 0, 10 do
