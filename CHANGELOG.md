@@ -3,6 +3,60 @@
 The format loosely follows [Keep a Changelog](https://keepachangelog.com/), and
 the project uses [semantic versioning](https://semver.org/).
 
+## [2.0.0] — 2026-11-13
+
+NaN bills subscriptions in credits now, and the API key no longer reaches the
+account and metrics endpoints 1.0 read, so the plugin is rebuilt around credits.
+
+### Changed
+
+- **One request per poll**, to NaN's documented usage report,
+  `https://api.nan.builders/v1/usage`. The plugin no longer calls
+  `cloud-api.nan.builders`: its quota endpoint stopped updating, and its account and
+  metrics endpoints now refuse API keys.
+- **The bar shows the period's credits**: the share of the allowance used (or the
+  credits used or left), the time to the renewal, and a colour that follows the
+  pace, counting credit packs. It shows `paused` when the subscription is, and the
+  packs left once the allowance is spent.
+- **The panel is rebuilt around the billing period**: credits used, left and in
+  packs with the pace drawn ahead of them, the tokens split into new input, cached
+  input and output with the cache share, credits per day, and each model's share.
+  A model's detail adds an estimate of its credits split by token type.
+- **`dependencies` names only `xdg-open`.** Noctalia shows the list as "requires
+  …", and `gio, xdg-open` read as both being needed; either one works, and with
+  neither the address is copied instead.
+
+### Added
+
+- **The cache share** in the tooltip and the panel, and in the bar with the new
+  `show_cache` setting.
+- **What the cache saved**, in credits.
+- **Every model's prices** per 1M tokens of new input, cached input and output, in
+  its detail, for the models you have not used yet too.
+- **`bar_value`**: the bar's figure as a percentage, credits used, or credits left.
+- **More gauges**: besides the bar, 10 or 5 segments, a ring, a battery that drains
+  as credits go, and a sparkline of credits per day.
+- **A banner and a "Buy a credit pack" button** when the credits and packs are
+  spent, and a banner when the subscription is paused.
+- **`prices.luau`**, NaN's per-model prices, and `tools/prices-from-har.py`, which
+  generates it from a HAR of NaN's own price list.
+
+### Removed
+
+- The per-model token caps and the plan tier: no endpoint an API key can read
+  reports them any more.
+- The settings `panel_model`, `panel_model_id`, `show_model`, `hide_unused`,
+  `show_metrics` and `show_percentage`. Values saved for them are ignored.
+
+## [1.0.1] — 2026-10-26
+
+Made in the community plugins repository by its maintainers.
+
+### Changed
+
+- The panel's cards use the renamed palette roles `surface_container` and
+  `outline_variant`, which need plugin API 43.
+
 ## [1.0.0] — 2026-09-23
 
 First release.
