@@ -21,7 +21,7 @@ own. It can show the credits used or left instead, and the cache share after the
 countdown. The gauge beside the figure can be a bar, 10 or 5 segments, a ring, a
 battery that drains as credits go, a line of credits per day, or nothing.
 
-![The bar widget: the NaN mark, the share of the allowance used, and the time to the renewal](screenshots/bar.png)
+![The bar widget with the sparkline gauge: the NaN mark, credits per day, the share of the allowance used, and the time to the renewal](screenshots/bar.png)
 
 Hovering the widget lists the values instead: credits used and the allowance, what is
 left, the renewal, the pace, today's credits, the cache share and token split, what the
