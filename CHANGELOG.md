@@ -6,7 +6,7 @@ the project uses [semantic versioning](https://semver.org/).
 ## [2.0.0] — 2026-11-13
 
 NaN bills subscriptions in credits now, and the API key no longer reaches the
-account and metrics endpoints 1.0 read, so the plugin is rebuilt around credits.
+account and metrics endpoints 1.0.1 read, so the plugin is rebuilt around credits.
 
 ### Changed
 
@@ -34,8 +34,8 @@ account and metrics endpoints 1.0 read, so the plugin is rebuilt around credits.
 - **Every model's prices** per 1M tokens of new input, cached input and output, in
   its detail, for the models you have not used yet too.
 - **`bar_value`**: the bar's figure as a percentage, credits used, or credits left.
-- **More gauges**: besides the bar, 10 or 5 segments, a ring, a battery that drains
-  as credits go, and a sparkline of credits per day.
+- **More gauges**: besides the bar, a battery that drains as credits go, and a
+  sparkline of credits per day.
 - **A banner and a "Buy a credit pack" button** when the credits and packs are
   spent, and a banner when the subscription is paused.
 - **`prices.luau`**, NaN's per-model prices, and `tools/prices-from-har.py`, which

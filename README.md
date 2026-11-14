@@ -18,8 +18,8 @@ and that is what makes this repository installable as one.
 The bar shows the period's credits: the share of the allowance used and the time to
 the renewal. The colour follows how alarming the pace is, not the percentage on its
 own. It can show the credits used or left instead, and the cache share after the
-countdown. The gauge beside the figure can be a bar, 10 or 5 segments, a ring, a
-battery that drains as credits go, a line of credits per day, or nothing.
+countdown. The gauge beside the figure can be a bar, a battery that drains as credits
+go, a line of credits per day, or nothing.
 
 ![The bar widget with the sparkline gauge: the NaN mark, credits per day, the share of the allowance used, and the time to the renewal](screenshots/bar.png)
 
@@ -54,8 +54,8 @@ noctalia msg plugins source add nan-usage path "$PWD"
 noctalia msg plugins enable cmoro-deusto/nan-usage
 ```
 
-`.luau` edits hot-reload. Manifest changes are read on the next configuration reload, and
-toggling the plugin forces one.
+`.luau` edits hot-reload. Manifest and translation changes are read on the next
+configuration reload, and toggling the plugin forces one.
 
 ### As a drop-in
 
@@ -116,9 +116,9 @@ That runs the three checks in `nan-usage/tests/`:
   stubs of the Noctalia API, under a fixed clock. It asserts that the poller reads the
   key, asks `/v1/usage` and nothing else, follows a second page and publishes what came
   back; that a failed poll keeps the last good numbers and says why; that the surfaces
-  paint that data without spawning anything; that every gauge draws what it should and
-  every gauge raster it can ask for exists; and that a refresh is asked for over the
-  shared state channel. Plain Lua 5.4, no dependencies, under a second.
+  paint that data without spawning anything; that every gauge draws what it should;
+  and that a refresh is asked for over the shared state channel. Plain Lua 5.4, no
+  dependencies, under a second.
 - `plugin_check.py` reads rather than runs. It checks the manifest against its
   translation keys, the plugin directory against its id, and every API member, `ui`
   control, `ui` prop, callback and translation key against Noctalia's own type
@@ -155,18 +155,14 @@ plugin's version for new prices like for any other change.
 ## The icons
 
 `nan-usage/nan.svg` is the source of the three logo rasters the plugin draws: the
-coloured mark, and a black-on-white and white-on-black ghost pair for the theme. The
-same script draws the ring and segment gauges into `nan-usage/gauges/`: a ring per 10%
-step and a bar per number of lit cells, in the theme's ink, amber and red, for a dark
-and a light theme. Regenerate them all with `./generate-icons.sh` at the repository
-root. It needs `rsvg-convert`, and it writes into `nan-usage/`, which is where the
-plugin ships them.
+coloured mark, and a black-on-white and white-on-black ghost pair for the theme. They
+are rasters because whether a Qt build can render SVG depends on its image plugins
+being installed, and an icon that silently fails to appear is worse than a slightly
+larger file.
 
-They are rasters for two reasons. Whether a Qt build can render SVG depends on its
-image plugins being installed, and an icon that silently fails to appear is worse than
-a slightly larger file. And a raster scales as one piece, so the gauge cells stay
-evenly spaced at any scale factor, where a row of separate shapes rounds each gap on
-its own.
+If the SVG changes, draw them again at 96 × 96 with `rsvg-convert`: `nan.png` from the
+SVG as it is, and the ghost pair from copies with every `fill` set to `#ffffff`
+(`nan-ghost-white.png`) and to `#000000` (`nan-ghost-black.png`).
 
 ## License
 
